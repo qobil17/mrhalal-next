@@ -1,0 +1,26 @@
+#mobile-wrap {
+	.products-layout {
+		grid-template-columns: 1fr;
+	}
+
+	.filter-aside {
+		display: none;
+	}
+
+	.products-grid {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 16px;
+	}
+
+	.product-card-body {
+		padding: 12px;
+	}
+
+	.product-card-name {
+		font-size: 13px;
+	}
+
+	.product-card-price {
+		font-size: 15px;
+	}
+}

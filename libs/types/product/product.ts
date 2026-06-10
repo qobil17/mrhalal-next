@@ -11,3 +11,13 @@ export interface Product {
 	productLeftCount: number;
 	createdAt: Date;
 }
+
+export interface ProductCard {
+	_id: string;
+	productName: string;
+	productUnit: string;
+	productPrice: number;
+	productImage: string;
+	productLeftCount: number;
+	productStatus: string;
+}

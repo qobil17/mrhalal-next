@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat eslint.config.mjs)",
+      "Bash(cat .eslintrc.json)",
+      "Bash(netstat -ano)",
+      "Bash(findstr :3000)"
+    ]
+  }
+}
