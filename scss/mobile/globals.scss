@@ -1,0 +1,23 @@
+#mobile-wrap {
+	.container {
+		width: 100%;
+		padding: 0 16px;
+	}
+
+	.page-content {
+		min-height: calc(100vh - 56px - 320px);
+		padding: 20px 0;
+	}
+
+	.hero {
+		padding: 40px 0;
+
+		h1 {
+			font-size: 26px;
+		}
+
+		p {
+			font-size: 15px;
+		}
+	}
+}

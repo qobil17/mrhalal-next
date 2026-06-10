@@ -15,7 +15,7 @@ const LayoutHome = ({ children }: LayoutHomeProps) => {
 		return (
 			<div id="mobile-wrap">
 				<Top />
-				{children}
+				<div className="container page-content">{children}</div>
 				<Footer />
 			</div>
 		);
@@ -24,7 +24,7 @@ const LayoutHome = ({ children }: LayoutHomeProps) => {
 	return (
 		<div id="pc-wrap">
 			<Top />
-			{children}
+			<div className="container page-content">{children}</div>
 			<Footer />
 		</div>
 	);

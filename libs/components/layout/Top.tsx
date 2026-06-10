@@ -21,7 +21,7 @@ const Top = () => {
 			<nav className="mobile-navbar">
 				<div className="mobile-navbar-row">
 					<Link href="/" className="logo">
-						<Image src="/logo.png" width={100} height={50} alt="Mr. Halal" />
+						<Image src="/mrhalal_logo_v3.svg" width={100} height={50} alt="Mr. Halal" />
 					</Link>
 					<button className="hamburger" onClick={() => setOpen((prev) => !prev)} aria-label="Menu">
 						☰
@@ -64,35 +64,37 @@ const Top = () => {
 
 	return (
 		<nav className="navbar">
-			<Link href="/" className="logo">
-				<Image src="/logo.png" width={120} height={60} alt="Mr. Halal" />
-			</Link>
+			<div className="container">
+				<Link href="/" className="logo">
+					<Image src="/mrhalal_logo_v3.svg" width={120} height={60} alt="Mr. Halal" />
+				</Link>
 
-			<div className="nav-links">
-				<Link href="/">Home</Link>
-				<Link href="/products">Products</Link>
-				<Link href="/about">About</Link>
-			</div>
-
-			<div className="nav-right">
-				<div className="lang-switcher">
-					<button>UZ</button>
-					<button>KO</button>
-					<button>EN</button>
+				<div className="nav-links">
+					<Link href="/">Home</Link>
+					<Link href="/products">Products</Link>
+					<Link href="/about">About</Link>
 				</div>
 
-				{user?.memberFirstName ? (
-					<div className="auth-box">
-						<span className="user-name">{user.memberFirstName}</span>
-						<button className="auth-btn" onClick={handleLogout}>
-							Logout
-						</button>
+				<div className="nav-right">
+					<div className="lang-switcher">
+						<button>UZ</button>
+						<button>KO</button>
+						<button>EN</button>
 					</div>
-				) : (
-					<Link href="/auth" className="auth-btn">
-						Login
-					</Link>
-				)}
+
+					{user?.memberFirstName ? (
+						<div className="auth-box">
+							<span className="user-name">{user.memberFirstName}</span>
+							<button className="auth-btn" onClick={handleLogout}>
+								Logout
+							</button>
+						</div>
+					) : (
+						<Link href="/auth" className="auth-btn">
+							Login
+						</Link>
+					)}
+				</div>
 			</div>
 		</nav>
 	);
