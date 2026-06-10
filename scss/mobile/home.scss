@@ -26,4 +26,23 @@
 	.category-name {
 		font-size: 12px;
 	}
+
+	.category-section-wrap {
+		padding: 20px 0;
+	}
+
+	.category-scroll-section {
+		h3 {
+			text-align: center;
+		}
+	}
+
+	.frame-wrap {
+		padding: 28px 0;
+	}
+
+	.products-grid.products-grid--4col {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 16px;
+	}
 }

@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import useDeviceDetect from '../../hooks/useDeviceDetect';
 
 interface Category {
 	id: number;
@@ -19,11 +18,9 @@ const categories: Category[] = [
 ];
 
 const CategoryScroll = () => {
-	const device = useDeviceDetect();
-
 	return (
 		<section className="category-scroll-section">
-			<h3>{device === 'mobile' ? 'Kategoriyalar' : "Kategoriyalar bo'yicha xarid qiling"}</h3>
+			<h3>Kategoriyalar</h3>
 			<div className="category-scroll">
 				{categories.map((category) => (
 					<Link key={category.id} href={`/products?category=${category.slug}`} className="category-item">

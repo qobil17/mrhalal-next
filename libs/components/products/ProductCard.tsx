@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { ProductCard as ProductCardType } from '../../types/product/product';
 
 interface ProductCardProps {
@@ -8,12 +9,12 @@ interface ProductCardProps {
 const DEFAULT_EMOJI = '🛒';
 
 const ProductCard = ({ product }: ProductCardProps) => {
-	const { productName, productUnit, productPrice, productImage, productLeftCount } = product;
+	const { _id, productName, productUnit, productPrice, productImage, productLeftCount } = product;
 
 	const isImagePath = productImage.startsWith('/') || productImage.startsWith('http');
 
 	return (
-		<div className="product-card">
+		<Link href={`/products/${_id}`} className="product-card">
 			<div className="product-card-image">
 				{isImagePath ? (
 					<Image
@@ -34,11 +35,17 @@ const ProductCard = ({ product }: ProductCardProps) => {
 				<p className="product-card-price">₩{productPrice.toLocaleString()}</p>
 				<p className="product-card-stock">Omborda: {productLeftCount} ta</p>
 
-				<button type="button" className="add-to-cart-btn">
+				<button
+					type="button"
+					className="add-to-cart-btn"
+					onClick={(e) => {
+						e.preventDefault();
+					}}
+				>
 					Savatga
 				</button>
 			</div>
-		</div>
+		</Link>
 	);
 };
 

@@ -108,10 +108,13 @@
 }
 
 .product-card {
+	display: block;
 	background: #fff;
 	border-radius: 12px;
 	overflow: hidden;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+	text-decoration: none;
+	color: inherit;
 	transition: transform 0.2s;
 
 	&:hover {

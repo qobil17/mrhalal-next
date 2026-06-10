@@ -1,41 +1,41 @@
 import { useMemo, useState } from 'react';
 import type { NextPage } from 'next';
+import { useRouter } from 'next/router';
 import { withLayoutHome } from '../../libs/components/layout/LayoutHome';
+import CategoryScroll from '../../libs/components/homepage/CategoryScroll';
 import ProductCard from '../../libs/components/products/ProductCard';
 import ProductFilter, { initialProductFilters, ProductFilters } from '../../libs/components/products/ProductFilter';
-import { ProductCard as ProductCardType } from '../../libs/types/product/product';
+import { mockProducts } from '../../libs/data/mockProducts';
 
-interface MockProduct extends ProductCardType {
-	category: string;
-}
-
-const mockProducts: MockProduct[] = [
-	{ _id: 'beef-1', productName: "Mol go'shti (Antrekot)", productUnit: 'KG', productPrice: 45000, productImage: '🥩', productLeftCount: 10, productStatus: 'ACTIVE', category: "Mol go'shti" },
-	{ _id: 'beef-2', productName: "Mol go'shti (Filey)", productUnit: 'KG', productPrice: 62000, productImage: '🥩', productLeftCount: 10, productStatus: 'ACTIVE', category: "Mol go'shti" },
-	{ _id: 'beef-3', productName: "Mol go'shti (Farsh)", productUnit: 'KG', productPrice: 38000, productImage: '🥩', productLeftCount: 10, productStatus: 'ACTIVE', category: "Mol go'shti" },
-
-	{ _id: 'lamb-1', productName: "Qo'y go'shti (Koreyka)", productUnit: 'KG', productPrice: 58000, productImage: '🐑', productLeftCount: 10, productStatus: 'ACTIVE', category: "Qo'y go'shti" },
-	{ _id: 'lamb-2', productName: "Qo'y go'shti (Oyoq)", productUnit: 'KG', productPrice: 49000, productImage: '🐑', productLeftCount: 10, productStatus: 'ACTIVE', category: "Qo'y go'shti" },
-	{ _id: 'lamb-3', productName: "Qo'y go'shti (Qovurg'a)", productUnit: 'KG', productPrice: 53000, productImage: '🐑', productLeftCount: 10, productStatus: 'ACTIVE', category: "Qo'y go'shti" },
-
-	{ _id: 'chicken-1', productName: "Tovuq go'shti (Butun)", productUnit: 'KG', productPrice: 22000, productImage: '🍗', productLeftCount: 10, productStatus: 'ACTIVE', category: 'Tovuq' },
-	{ _id: 'chicken-2', productName: "Tovuq filesi (Ko'krak)", productUnit: 'KG', productPrice: 27000, productImage: '🍗', productLeftCount: 10, productStatus: 'ACTIVE', category: 'Tovuq' },
-	{ _id: 'chicken-3', productName: 'Tovuq qanoti', productUnit: 'KG', productPrice: 19000, productImage: '🍗', productLeftCount: 10, productStatus: 'ACTIVE', category: 'Tovuq' },
-
-	{ _id: 'grocery-1', productName: 'Guruch (Premium)', productUnit: 'KG', productPrice: 32000, productImage: '🛒', productLeftCount: 10, productStatus: 'ACTIVE', category: 'Oziq-ovqat' },
-	{ _id: 'grocery-2', productName: 'Un (Premium)', productUnit: 'KG', productPrice: 18000, productImage: '🛒', productLeftCount: 10, productStatus: 'ACTIVE', category: 'Oziq-ovqat' },
-	{ _id: 'grocery-3', productName: "O'simlik yog'i", productUnit: 'KG', productPrice: 24000, productImage: '🛒', productLeftCount: 10, productStatus: 'ACTIVE', category: 'Oziq-ovqat' },
-];
+const CATEGORY_SLUG_TO_NAME: Record<string, string> = {
+	beef: "Mol go'shti",
+	lamb: "Qo'y go'shti",
+	chicken: 'Tovuq',
+	fish: 'Baliq',
+	grocery: 'Oziq-ovqat',
+	spices: 'Ziravorlar',
+};
 
 const ProductsPage: NextPage = () => {
+	const router = useRouter();
 	const [filters, setFilters] = useState<ProductFilters>(initialProductFilters);
+	const [visibleCount, setVisibleCount] = useState(8);
+
+	const handleFilter = (next: ProductFilters) => {
+		setFilters(next);
+		setVisibleCount(8);
+	};
+
+	const categorySlug = typeof router.query.category === 'string' ? router.query.category : '';
+	const activeCategory = CATEGORY_SLUG_TO_NAME[categorySlug];
 
 	const filteredProducts = useMemo(() => {
 		const min = filters.minPrice ? Number(filters.minPrice) : null;
 		const max = filters.maxPrice ? Number(filters.maxPrice) : null;
+		const categories = filters.categories.length > 0 ? filters.categories : activeCategory ? [activeCategory] : [];
 
 		return mockProducts.filter((product) => {
-			if (filters.categories.length > 0 && !filters.categories.includes(product.category)) {
+			if (categories.length > 0 && !categories.includes(product.category)) {
 				return false;
 			}
 
@@ -53,14 +53,16 @@ const ProductsPage: NextPage = () => {
 
 			return true;
 		});
-	}, [filters]);
+	}, [filters, activeCategory]);
 
 	return (
 		<div className="products-page">
 			<div className="container">
+				<CategoryScroll />
+
 				<div className="products-layout">
 					<aside className="filter-aside">
-						<ProductFilter onFilter={setFilters} />
+						<ProductFilter onFilter={handleFilter} />
 					</aside>
 
 					<main className="products-main">
@@ -70,9 +72,17 @@ const ProductsPage: NextPage = () => {
 						</div>
 
 						<div className="products-grid">
-							{filteredProducts.map((product) => (
+							{filteredProducts.slice(0, visibleCount).map((product) => (
 								<ProductCard key={product._id} product={product} />
 							))}
+						</div>
+
+						<div className="show-more-wrap">
+							{visibleCount < filteredProducts.length && (
+								<button type="button" className="show-more-btn" onClick={() => setVisibleCount((prev) => prev + 8)}>
+									Ko&apos;proq ko&apos;rish
+								</button>
+							)}
 						</div>
 					</main>
 				</div>
