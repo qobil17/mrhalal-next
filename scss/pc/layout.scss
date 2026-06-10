@@ -100,8 +100,8 @@
 	}
 
 	footer {
-		background: #1a1a1a;
-		color: #fff;
+		background: #f5f5f5;
+		color: #222222;
 		padding: 40px;
 
 		.footer-grid {
@@ -110,14 +110,13 @@
 			gap: 24px;
 		}
 
-		.footer-brand p {
+		.footer-tagline {
 			margin-top: 12px;
-			color: #ccc;
+			color: #666666;
 		}
 
 		.footer-contact p {
 			margin: 4px 0;
-			color: #ccc;
 		}
 
 		.footer-social {
@@ -125,7 +124,7 @@
 			gap: 16px;
 
 			a {
-				color: #fff;
+				color: #cc1b1b;
 				text-decoration: none;
 
 				&:hover {
@@ -135,11 +134,11 @@
 		}
 
 		.footer-bottom {
-			border-top: 1px solid #333;
+			border-top: 1px solid #e0e0e0;
 			text-align: center;
 			padding-top: 20px;
 			margin-top: 20px;
-			color: #999;
+			color: #666666;
 		}
 	}
 }

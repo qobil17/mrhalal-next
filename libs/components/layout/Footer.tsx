@@ -14,7 +14,7 @@ const Footer = () => {
 				<div className="footer-grid">
 					<div className="footer-brand">
 						<Image src="/mrhalal_logo_v3.svg" width={logoWidth} height={logoHeight} alt="Mr. Halal" />
-						<p>Koreyadagi halol go&apos;sht do&apos;koni</p>
+						<p className="footer-tagline">Koreyadagi halol go&apos;sht do&apos;koni</p>
 					</div>
 
 					<div className="footer-contact">
