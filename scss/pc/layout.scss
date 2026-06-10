@@ -1,0 +1,142 @@
+#pc-wrap {
+	nav {
+		background: #cc1b1b;
+		height: 70px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0 40px;
+		position: sticky;
+		top: 0;
+		z-index: 100;
+
+		.logo {
+			display: flex;
+			align-items: center;
+		}
+
+		.nav-links {
+			display: flex;
+			gap: 32px;
+
+			a {
+				color: #fff;
+				font-weight: 600;
+				text-decoration: none;
+
+				&:hover {
+					opacity: 0.8;
+				}
+			}
+		}
+
+		.nav-right {
+			display: flex;
+			align-items: center;
+			gap: 20px;
+		}
+
+		.lang-switcher {
+			display: flex;
+			gap: 6px;
+
+			button {
+				font-size: 12px;
+				padding: 4px 10px;
+				border: 1px solid #fff;
+				border-radius: 4px;
+				color: #fff;
+				background: transparent;
+				cursor: pointer;
+
+				&:hover {
+					opacity: 0.8;
+				}
+			}
+		}
+
+		.auth-btn {
+			background: #fff;
+			color: #cc1b1b;
+			border: none;
+			border-radius: 6px;
+			padding: 6px 16px;
+			font-weight: 600;
+			text-decoration: none;
+			cursor: pointer;
+
+			&:hover {
+				opacity: 0.8;
+			}
+		}
+
+		.auth-box {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			color: #fff;
+
+			.user-name {
+				font-weight: 600;
+			}
+
+			button {
+				background: #fff;
+				color: #cc1b1b;
+				border: none;
+				border-radius: 6px;
+				padding: 6px 16px;
+				font-weight: 600;
+				cursor: pointer;
+
+				&:hover {
+					opacity: 0.8;
+				}
+			}
+		}
+	}
+
+	footer {
+		background: #1a1a1a;
+		color: #fff;
+		padding: 40px;
+
+		.footer-grid {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 24px;
+		}
+
+		.footer-brand p {
+			margin-top: 12px;
+			color: #ccc;
+		}
+
+		.footer-contact p {
+			margin: 4px 0;
+			color: #ccc;
+		}
+
+		.footer-social {
+			display: flex;
+			gap: 16px;
+
+			a {
+				color: #fff;
+				text-decoration: none;
+
+				&:hover {
+					opacity: 0.8;
+				}
+			}
+		}
+
+		.footer-bottom {
+			border-top: 1px solid #333;
+			text-align: center;
+			padding-top: 20px;
+			margin-top: 20px;
+			color: #999;
+		}
+	}
+}

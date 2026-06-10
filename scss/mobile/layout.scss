@@ -1,0 +1,137 @@
+#mobile-wrap {
+	.mobile-navbar {
+		background: #cc1b1b;
+		height: 56px;
+		display: flex;
+		flex-direction: column;
+		position: sticky;
+		top: 0;
+		z-index: 100;
+
+		.mobile-navbar-row {
+			height: 56px;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 0 16px;
+		}
+
+		.logo {
+			display: flex;
+			align-items: center;
+		}
+
+		.hamburger {
+			background: transparent;
+			border: none;
+			color: #fff;
+			font-size: 24px;
+			line-height: 1;
+			cursor: pointer;
+		}
+
+		.mobile-menu {
+			display: flex;
+			flex-direction: column;
+			background: #fff;
+			padding: 16px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+			a {
+				padding: 12px 0;
+				color: #1a1a1a;
+				font-weight: 600;
+				text-decoration: none;
+				border-bottom: 1px solid #eee;
+			}
+
+			.lang-switcher {
+				display: flex;
+				gap: 8px;
+				padding: 12px 0;
+
+				button {
+					font-size: 12px;
+					padding: 4px 10px;
+					border: 1px solid #cc1b1b;
+					border-radius: 4px;
+					color: #cc1b1b;
+					background: transparent;
+					cursor: pointer;
+				}
+			}
+
+			.login-btn {
+				display: block;
+				background: #cc1b1b;
+				color: #fff;
+				border: none;
+				border-radius: 6px;
+				padding: 10px 16px;
+				text-align: center;
+				border-bottom: none;
+			}
+
+			.auth-box {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 12px 0;
+
+				.user-name {
+					font-weight: 600;
+					color: #1a1a1a;
+				}
+
+				button {
+					background: #cc1b1b;
+					color: #fff;
+					border: none;
+					border-radius: 6px;
+					padding: 6px 16px;
+					cursor: pointer;
+				}
+			}
+		}
+	}
+
+	footer {
+		background: #1a1a1a;
+		color: #fff;
+		padding: 24px 16px;
+
+		.footer-grid {
+			display: flex;
+			flex-direction: column;
+			gap: 20px;
+		}
+
+		.footer-brand p {
+			margin-top: 12px;
+			color: #ccc;
+		}
+
+		.footer-contact p {
+			margin: 4px 0;
+			color: #ccc;
+		}
+
+		.footer-social {
+			display: flex;
+			gap: 16px;
+
+			a {
+				color: #fff;
+				text-decoration: none;
+			}
+		}
+
+		.footer-bottom {
+			border-top: 1px solid #333;
+			text-align: center;
+			padding-top: 16px;
+			margin-top: 16px;
+			color: #999;
+		}
+	}
+}
