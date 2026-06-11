@@ -1,11 +1,12 @@
 export interface LoginInput {
-	memberPhone: string;
-	memberPassword: string;
+	phone: string;
+	password: string;
 }
 
 export interface RegisterInput {
-	memberPhone: string;
-	memberPassword: string;
-	memberFirstName: string;
-	memberLastName: string;
+	firstName: string;
+	lastName?: string;
+	phone: string;
+	password: string;
+	email?: string;
 }

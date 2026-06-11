@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useReactiveVar } from '@apollo/client';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
-
-const mockUser = {
-	firstName: 'Qobilbek',
-	memberImage: '',
-};
+import { userVar } from '../../../apollo/client';
+import { logOut } from '../../auth';
+import type { Member } from '../../types/member/member';
 
 const Top = () => {
 	const device = useDeviceDetect();
 	const [open, setOpen] = useState(false);
 	const cartCount = 3;
+	const user = useReactiveVar(userVar) as Member | null;
 
 	if (device === 'mobile') {
 		return (
@@ -27,10 +27,16 @@ const Top = () => {
 							{cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
 						</Link>
 
-						<Link href="/profile" className="profile-nav-btn">
-							<span className="profile-nav-avatar">👤</span>
-							<span className="profile-nav-name">{mockUser.firstName}</span>
-						</Link>
+						{user ? (
+							<Link href="/profile" className="profile-nav-btn">
+								<span className="profile-nav-avatar">👤</span>
+								<span className="profile-nav-name">{user.firstName}</span>
+							</Link>
+						) : (
+							<Link href="/auth" className="auth-btn">
+								Login
+							</Link>
+						)}
 
 						<button className="hamburger" onClick={() => setOpen((prev) => !prev)} aria-label="Menu">
 							☰
@@ -55,6 +61,12 @@ const Top = () => {
 							<button>KO</button>
 							<button>EN</button>
 						</div>
+
+						{user && (
+							<button className="mobile-logout-btn" onClick={logOut}>
+								Chiqish
+							</button>
+						)}
 					</div>
 				)}
 			</nav>
@@ -86,10 +98,21 @@ const Top = () => {
 						<button>EN</button>
 					</div>
 
-					<Link href="/profile" className="profile-nav-btn">
-						<span className="profile-nav-avatar">👤</span>
-						<span className="profile-nav-name">{mockUser.firstName}</span>
-					</Link>
+					{user ? (
+						<div className="nav-user">
+							<Link href="/profile" className="profile-nav-btn">
+								<span className="profile-nav-avatar">👤</span>
+								<span className="profile-nav-name">{user.firstName}</span>
+							</Link>
+							<button className="nav-logout-btn" onClick={logOut}>
+								Chiqish
+							</button>
+						</div>
+					) : (
+						<Link href="/auth" className="auth-btn">
+							Login
+						</Link>
+					)}
 				</div>
 			</div>
 		</nav>

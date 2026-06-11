@@ -1,13 +1,15 @@
-import { MemberRole, MemberStatus } from '../../enums/member.enum';
-
 export interface Member {
 	id: string;
-	memberType: MemberRole;
-	memberStatus: MemberStatus;
-	memberPhone: string;
-	memberFirstName?: string;
-	memberLastName?: string;
-	memberImage?: string;
-	createdAt: Date;
-	updatedAt: Date;
+	firstName: string;
+	lastName: string;
+	phone: string;
+	email: string;
+	avatar: string;
+	role: string;
+	isActive: boolean;
+}
+
+export interface AuthPayload {
+	accessToken: string;
+	member: Member;
 }

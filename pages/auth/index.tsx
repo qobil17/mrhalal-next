@@ -1,19 +1,18 @@
 import { useCallback, useState } from 'react';
 import type { NextPage } from 'next';
+import { useRouter } from 'next/router';
+import { ApolloError, useMutation } from '@apollo/client';
+import Swal from 'sweetalert2';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
+import { LOGIN, REGISTER } from '../../apollo/user/mutation';
+import { setJwtToken } from '../../libs/auth';
+import { userVar } from '../../apollo/client';
+import type { LoginInput, RegisterInput } from '../../libs/types/member/member.input';
+import type { AuthPayload } from '../../libs/types/member/member';
 
 type AuthTab = 'login' | 'register';
 
-interface LoginInput {
-	phone: string;
-	password: string;
-}
-
-interface RegisterInput {
-	firstName: string;
-	lastName: string;
-	phone: string;
-	password: string;
+interface RegisterFormInput extends RegisterInput {
 	confirmPassword: string;
 }
 
@@ -22,7 +21,7 @@ const initialLoginInput: LoginInput = {
 	password: '',
 };
 
-const initialRegisterInput: RegisterInput = {
+const initialRegisterInput: RegisterFormInput = {
 	firstName: '',
 	lastName: '',
 	phone: '',
@@ -30,40 +29,113 @@ const initialRegisterInput: RegisterInput = {
 	confirmPassword: '',
 };
 
+const getErrorMessage = (err: unknown): string => {
+	if (err instanceof ApolloError) {
+		const graphQLError = err.graphQLErrors?.[0];
+		const originalError = graphQLError?.extensions?.originalError as { message?: string | string[] } | undefined;
+		const message = originalError?.message ?? graphQLError?.message ?? err.message;
+		return Array.isArray(message) ? message.join(', ') : message || 'Xatolik yuz berdi';
+	}
+	return err instanceof Error ? err.message : 'Xatolik yuz berdi';
+};
+
 const AuthPage: NextPage = () => {
 	const device = useDeviceDetect();
+	const router = useRouter();
 	const [activeTab, setActiveTab] = useState<AuthTab>('login');
 	const [loginInput, setLoginInput] = useState<LoginInput>(initialLoginInput);
-	const [registerInput, setRegisterInput] = useState<RegisterInput>(initialRegisterInput);
+	const [registerInput, setRegisterInput] = useState<RegisterFormInput>(initialRegisterInput);
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+	const [login, { loading: loginLoading }] = useMutation<{ login: AuthPayload }, { input: LoginInput }>(LOGIN);
+	const [register, { loading: registerLoading }] = useMutation<{ register: AuthPayload }, { input: RegisterInput }>(
+		REGISTER,
+	);
 
 	const handleLoginInput = useCallback((name: keyof LoginInput, value: string) => {
 		setLoginInput((prev) => ({ ...prev, [name]: value }));
 	}, []);
 
-	const handleRegisterInput = useCallback((name: keyof RegisterInput, value: string) => {
+	const handleRegisterInput = useCallback((name: keyof RegisterFormInput, value: string) => {
 		setRegisterInput((prev) => ({ ...prev, [name]: value }));
 	}, []);
 
+	const handleLogin = useCallback(async () => {
+		try {
+			const { data } = await login({
+				variables: {
+					input: {
+						phone: loginInput.phone,
+						password: loginInput.password,
+					},
+				},
+			});
+
+			if (!data) throw new Error('Kirishda xatolik yuz berdi');
+
+			const { accessToken, member } = data.login;
+			setJwtToken(accessToken);
+			userVar(member);
+
+			await Swal.fire({ icon: 'success', title: 'Muvaffaqiyatli kirdingiz!', timer: 1500, showConfirmButton: false });
+			router.push('/');
+		} catch (err) {
+			const message = getErrorMessage(err);
+			await Swal.fire({ icon: 'error', title: 'Xatolik', text: message });
+		}
+	}, [loginInput, login, router]);
+
+	const handleRegister = useCallback(async () => {
+		try {
+			const { data } = await register({
+				variables: {
+					input: {
+						firstName: registerInput.firstName,
+						lastName: registerInput.lastName,
+						phone: registerInput.phone,
+						password: registerInput.password,
+					},
+				},
+			});
+
+			if (!data) throw new Error("Ro'yxatdan o'tishda xatolik yuz berdi");
+
+			const { accessToken, member } = data.register;
+			setJwtToken(accessToken);
+			userVar(member);
+
+			await Swal.fire({
+				icon: 'success',
+				title: "Muvaffaqiyatli ro'yxatdan o'tdingiz!",
+				timer: 1500,
+				showConfirmButton: false,
+			});
+			router.push('/');
+		} catch (err) {
+			const message = getErrorMessage(err);
+			await Swal.fire({ icon: 'error', title: 'Xatolik', text: message });
+		}
+	}, [registerInput, register, router]);
+
 	const handleLoginSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		console.log('LOGIN:', loginInput);
+		void handleLogin();
 	};
 
 	const handleRegisterSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		console.log('REGISTER:', registerInput);
+		void handleRegister();
 	};
 
-	const isLoginDisabled = !loginInput.phone || !loginInput.password;
+	const isLoginDisabled = !loginInput.phone || !loginInput.password || loginLoading;
 
 	const isRegisterDisabled =
 		!registerInput.firstName ||
-		!registerInput.lastName ||
 		!registerInput.phone ||
 		!registerInput.password ||
-		!registerInput.confirmPassword;
+		!registerInput.confirmPassword ||
+		registerLoading;
 
 	return (
 		<div id={device === 'mobile' ? 'mobile-wrap' : 'pc-wrap'} className="auth-page">
@@ -92,10 +164,11 @@ const AuthPage: NextPage = () => {
 						<input
 							type="tel"
 							className="auth-input"
-							placeholder="+82 10-0000-0000"
+							placeholder="01012345678"
 							value={loginInput.phone}
 							onChange={(e) => handleLoginInput('phone', e.target.value)}
 						/>
+						<small className="input-hint">Format: 01012345678 (Korean number)</small>
 						<div className="password-wrapper">
 							<input
 								type={showPassword ? 'text' : 'password'}
@@ -109,7 +182,7 @@ const AuthPage: NextPage = () => {
 							</button>
 						</div>
 						<button type="submit" className="auth-submit" disabled={isLoginDisabled}>
-							Kirish
+							{loginLoading ? 'Yuklanmoqda...' : 'Kirish'}
 						</button>
 					</form>
 				) : (
@@ -131,10 +204,11 @@ const AuthPage: NextPage = () => {
 						<input
 							type="tel"
 							className="auth-input"
-							placeholder="+82 10-0000-0000"
+							placeholder="01012345678"
 							value={registerInput.phone}
 							onChange={(e) => handleRegisterInput('phone', e.target.value)}
 						/>
+						<small className="input-hint">Format: 01012345678 (Korean number)</small>
 						<div className="password-wrapper">
 							<input
 								type={showPassword ? 'text' : 'password'}
@@ -164,7 +238,7 @@ const AuthPage: NextPage = () => {
 							</button>
 						</div>
 						<button type="submit" className="auth-submit" disabled={isRegisterDisabled}>
-							Ro&apos;yxatdan o&apos;tish
+							{registerLoading ? 'Yuklanmoqda...' : "Ro'yxatdan o'tish"}
 						</button>
 					</form>
 				)}

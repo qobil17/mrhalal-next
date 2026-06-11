@@ -88,6 +88,18 @@
 			font-weight: 600;
 		}
 
+		.auth-btn {
+			display: flex;
+			align-items: center;
+			text-decoration: none;
+			color: #cc1b1b;
+			background: #fff;
+			border-radius: 8px;
+			padding: 6px 14px;
+			font-weight: 600;
+			font-size: 13px;
+		}
+
 		.mobile-menu {
 			display: flex;
 			flex-direction: column;
@@ -117,6 +129,18 @@
 					background: transparent;
 					cursor: pointer;
 				}
+			}
+
+			.mobile-logout-btn {
+				margin-top: 8px;
+				padding: 12px;
+				background: #cc1b1b;
+				color: #fff;
+				border: none;
+				border-radius: 6px;
+				font-weight: 600;
+				font-size: 14px;
+				cursor: pointer;
 			}
 		}
 	}
