@@ -1,0 +1,27 @@
+.about-hero {
+	padding: 48px 0;
+
+	h1 {
+		font-size: 26px;
+	}
+}
+
+.about-section {
+	grid-template-columns: 1fr;
+}
+
+.about-image {
+	display: none;
+}
+
+.halal-cards {
+	grid-template-columns: 1fr;
+}
+
+.location-layout {
+	grid-template-columns: 1fr;
+}
+
+.about-stats {
+	gap: 16px;
+}
