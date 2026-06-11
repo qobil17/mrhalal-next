@@ -21,6 +21,12 @@
 			align-items: center;
 		}
 
+		.mobile-navbar-right {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+		}
+
 		.hamburger {
 			background: transparent;
 			border: none;
@@ -28,6 +34,58 @@
 			font-size: 24px;
 			line-height: 1;
 			cursor: pointer;
+		}
+
+		.cart-icon-btn {
+			position: relative;
+			display: flex;
+			align-items: center;
+			text-decoration: none;
+			padding: 4px 8px;
+		}
+
+		.cart-emoji {
+			font-size: 20px;
+		}
+
+		.cart-badge {
+			position: absolute;
+			top: -6px;
+			right: -4px;
+			background: #fff;
+			color: #cc1b1b;
+			font-size: 11px;
+			font-weight: 700;
+			width: 18px;
+			height: 18px;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.profile-nav-btn {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			text-decoration: none;
+			color: #fff;
+			background: rgba(255, 255, 255, 0.15);
+			border-radius: 8px;
+			padding: 6px 14px;
+
+			&:hover {
+				background: rgba(255, 255, 255, 0.25);
+			}
+		}
+
+		.profile-nav-avatar {
+			font-size: 18px;
+		}
+
+		.profile-nav-name {
+			font-size: 14px;
+			font-weight: 600;
 		}
 
 		.mobile-menu {
@@ -57,38 +115,6 @@
 					border-radius: 4px;
 					color: #cc1b1b;
 					background: transparent;
-					cursor: pointer;
-				}
-			}
-
-			.login-btn {
-				display: block;
-				background: #cc1b1b;
-				color: #fff;
-				border: none;
-				border-radius: 6px;
-				padding: 10px 16px;
-				text-align: center;
-				border-bottom: none;
-			}
-
-			.auth-box {
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				padding: 12px 0;
-
-				.user-name {
-					font-weight: 600;
-					color: #1a1a1a;
-				}
-
-				button {
-					background: #cc1b1b;
-					color: #fff;
-					border: none;
-					border-radius: 6px;
-					padding: 6px 16px;
 					cursor: pointer;
 				}
 			}

@@ -1,20 +1,17 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useReactiveVar } from '@apollo/client';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
-import { userVar } from '../../../apollo/client';
-import { removeJwtToken } from '../../auth';
+
+const mockUser = {
+	firstName: 'Qobilbek',
+	memberImage: '',
+};
 
 const Top = () => {
 	const device = useDeviceDetect();
-	const user = useReactiveVar(userVar);
 	const [open, setOpen] = useState(false);
-
-	const handleLogout = () => {
-		removeJwtToken();
-		userVar(null);
-	};
+	const cartCount = 3;
 
 	if (device === 'mobile') {
 		return (
@@ -23,9 +20,22 @@ const Top = () => {
 					<Link href="/" className="logo">
 						<Image src="/mrhalal_logo_v3.svg" width={100} height={50} alt="Mr. Halal" />
 					</Link>
-					<button className="hamburger" onClick={() => setOpen((prev) => !prev)} aria-label="Menu">
-						☰
-					</button>
+
+					<div className="mobile-navbar-right">
+						<Link href="/cart" className="cart-icon-btn">
+							<span className="cart-emoji">🛒</span>
+							{cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+						</Link>
+
+						<Link href="/profile" className="profile-nav-btn">
+							<span className="profile-nav-avatar">👤</span>
+							<span className="profile-nav-name">{mockUser.firstName}</span>
+						</Link>
+
+						<button className="hamburger" onClick={() => setOpen((prev) => !prev)} aria-label="Menu">
+							☰
+						</button>
+					</div>
 				</div>
 
 				{open && (
@@ -45,17 +55,6 @@ const Top = () => {
 							<button>KO</button>
 							<button>EN</button>
 						</div>
-
-						{user?.memberFirstName ? (
-							<div className="auth-box">
-								<span className="user-name">{user.memberFirstName}</span>
-								<button onClick={handleLogout}>Logout</button>
-							</div>
-						) : (
-							<Link href="/auth" className="login-btn" onClick={() => setOpen(false)}>
-								Login
-							</Link>
-						)}
 					</div>
 				)}
 			</nav>
@@ -76,24 +75,21 @@ const Top = () => {
 				</div>
 
 				<div className="nav-right">
+					<Link href="/cart" className="cart-icon-btn">
+						<span className="cart-emoji">🛒</span>
+						{cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+					</Link>
+
 					<div className="lang-switcher">
 						<button>UZ</button>
 						<button>KO</button>
 						<button>EN</button>
 					</div>
 
-					{user?.memberFirstName ? (
-						<div className="auth-box">
-							<span className="user-name">{user.memberFirstName}</span>
-							<button className="auth-btn" onClick={handleLogout}>
-								Logout
-							</button>
-						</div>
-					) : (
-						<Link href="/auth" className="auth-btn">
-							Login
-						</Link>
-					)}
+					<Link href="/profile" className="profile-nav-btn">
+						<span className="profile-nav-avatar">👤</span>
+						<span className="profile-nav-name">{mockUser.firstName}</span>
+					</Link>
 				</div>
 			</div>
 		</nav>

@@ -1,0 +1,13 @@
+#mobile-wrap {
+	.profile-layout {
+		grid-template-columns: 1fr;
+	}
+
+	.profile-sidebar {
+		position: static;
+	}
+
+	.wishlist-grid {
+		grid-template-columns: 1fr;
+	}
+}

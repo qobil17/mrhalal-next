@@ -1,0 +1,22 @@
+#mobile-wrap {
+	.cart-layout {
+		grid-template-columns: 1fr;
+	}
+
+	.cart-item {
+		grid-template-columns: 64px 1fr auto;
+		gap: 12px;
+	}
+
+	.cart-item-price {
+		display: none;
+	}
+
+	.cart-item-quantity {
+		display: none;
+	}
+
+	.cart-summary {
+		margin-top: 24px;
+	}
+}
