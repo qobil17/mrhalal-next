@@ -1,19 +1,27 @@
-import { OrderStatus } from '../../enums/order.enum';
-import { Product } from '../product/product';
-
 export interface OrderItem {
 	id: string;
-	itemQuantity: number;
-	itemPrice: number;
 	productId: string;
-	product?: Product;
+	productName: string;
+	quantity: number;
+	price: number;
+	subtotal: number;
 }
 
 export interface Order {
 	id: string;
-	orderStatus: OrderStatus;
-	orderTotal: number;
-	orderDeliveryFee: number;
-	createdAt: Date;
-	orderItems: OrderItem[];
+	orderNumber: string;
+	status: string;
+	subtotal: number;
+	deliveryFee: number;
+	total: number;
+	currency: string;
+	paymentMethod?: string;
+	notes?: string;
+	createdAt: string;
+	items: OrderItem[];
+}
+
+export interface OrdersResponse {
+	list: Order[];
+	total: number;
 }

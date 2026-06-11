@@ -1,34 +1,76 @@
 import Link from 'next/link';
+import Image from 'next/image';
+import { Category } from '../../types/category/category';
 
-interface Category {
+interface FallbackCategory {
 	id: number;
-	name: string;
+	nameUz: string;
 	nameKo: string;
 	emoji: string;
 	slug: string;
 }
 
-const categories: Category[] = [
-	{ id: 1, name: "Mol go'shti", nameKo: '소고기', emoji: '🥩', slug: 'beef' },
-	{ id: 2, name: "Qo'y go'shti", nameKo: '양고기', emoji: '🐑', slug: 'lamb' },
-	{ id: 3, name: 'Tovuq', nameKo: '닭고기', emoji: '🍗', slug: 'chicken' },
-	{ id: 4, name: 'Baliq', nameKo: '생선', emoji: '🐟', slug: 'fish' },
-	{ id: 5, name: 'Oziq-ovqat', nameKo: '식료품', emoji: '🛒', slug: 'grocery' },
-	{ id: 6, name: 'Ziravorlar', nameKo: '향신료', emoji: '🌶️', slug: 'spices' },
+const FALLBACK_CATEGORIES: FallbackCategory[] = [
+	{ id: 1, nameUz: "Mol go'shti", nameKo: '소고기', emoji: '🥩', slug: 'beef' },
+	{ id: 2, nameUz: "Qo'y go'shti", nameKo: '양고기', emoji: '🐑', slug: 'lamb' },
+	{ id: 3, nameUz: 'Tovuq', nameKo: '닭고기', emoji: '🍗', slug: 'chicken' },
+	{ id: 4, nameUz: 'Baliq', nameKo: '생선', emoji: '🐟', slug: 'fish' },
+	{ id: 5, nameUz: 'Oziq-ovqat', nameKo: '식료품', emoji: '🛒', slug: 'grocery' },
+	{ id: 6, nameUz: 'Ziravorlar', nameKo: '향신료', emoji: '🌶️', slug: 'spices' },
 ];
 
-const CategoryScroll = () => {
+const SLUG_EMOJI: Record<string, string> = {
+	beef: '🥩',
+	lamb: '🐑',
+	chicken: '🍗',
+	fish: '🐟',
+	grocery: '🛒',
+	spices: '🌶️',
+	'halal-meat': '🥩',
+	dairy: '🥛',
+	vegetables: '🥦',
+};
+
+const DEFAULT_EMOJI = '🛒';
+
+interface CategoryScrollProps {
+	categories?: Category[];
+}
+
+const CategoryScroll = ({ categories }: CategoryScrollProps) => {
+	const items = categories && categories.length > 0 ? categories : null;
+
 	return (
 		<section className="category-scroll-section">
 			<h3>Kategoriyalar</h3>
 			<div className="category-scroll">
-				{categories.map((category) => (
-					<Link key={category.id} href={`/products?category=${category.slug}`} className="category-item">
-						<div className="category-icon">{category.emoji}</div>
-						<span className="category-name">{category.name}</span>
-						<span className="category-name-ko">{category.nameKo}</span>
-					</Link>
-				))}
+				{items
+					? items.map((category) => (
+							<Link key={category.id} href={`/products?category=${category.slug}`} className="category-item">
+								<div className="category-icon">
+									{category.image ? (
+										<Image
+											src={category.image}
+											alt={category.nameUz}
+											width={48}
+											height={48}
+											style={{ objectFit: 'cover', borderRadius: '50%' }}
+										/>
+									) : (
+										SLUG_EMOJI[category.slug] ?? DEFAULT_EMOJI
+									)}
+								</div>
+								<span className="category-name">{category.nameUz}</span>
+								<span className="category-name-ko">{category.nameKo}</span>
+							</Link>
+						))
+					: FALLBACK_CATEGORIES.map((category) => (
+							<Link key={category.id} href={`/products?category=${category.slug}`} className="category-item">
+								<div className="category-icon">{category.emoji}</div>
+								<span className="category-name">{category.nameUz}</span>
+								<span className="category-name-ko">{category.nameKo}</span>
+							</Link>
+						))}
 			</div>
 		</section>
 	);

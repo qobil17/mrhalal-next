@@ -1,48 +1,49 @@
-import { OrderStatus } from '../../enums/order.enum';
+import { useQuery } from '@apollo/client';
+import { GET_MY_ORDERS } from '../../../apollo/user/query';
+import type { Order, OrdersResponse } from '../../types/order/order';
 
-interface MockOrder {
-	_id: string;
-	orderNumber: string;
-	orderStatus: OrderStatus;
-	orderTotal: number;
-	createdAt: string;
-}
-
-const mockOrders: MockOrder[] = [
-	{ _id: '1', orderNumber: 'HM-2024-0001', orderStatus: OrderStatus.DELIVERED, orderTotal: 45000, createdAt: '2024-01-15' },
-	{ _id: '2', orderNumber: 'HM-2024-0002', orderStatus: OrderStatus.PAID, orderTotal: 78000, createdAt: '2024-02-10' },
-	{ _id: '3', orderNumber: 'HM-2024-0003', orderStatus: OrderStatus.PENDING, orderTotal: 32000, createdAt: '2024-03-05' },
-];
-
-const STATUS_COLORS: Record<OrderStatus, string> = {
-	[OrderStatus.PENDING]: '#FFA500',
-	[OrderStatus.PAID]: '#1A9E6B',
-	[OrderStatus.SHIPPED]: '#3B82F6',
-	[OrderStatus.DELIVERED]: '#22C55E',
-	[OrderStatus.CANCELLED]: '#EF4444',
+const STATUS_COLORS: Record<string, string> = {
+	PENDING: '#FFA500',
+	CONFIRMED: '#8B5CF6',
+	PAID: '#1A9E6B',
+	SHIPPED: '#3B82F6',
+	DELIVERED: '#22C55E',
+	CANCELLED: '#EF4444',
 };
 
 const ProfileOrders = () => {
+	const { data, loading } = useQuery<{ getMyOrders: OrdersResponse }>(GET_MY_ORDERS, {
+		variables: { input: { page: 1, limit: 10 } },
+	});
+
+	const orders: Order[] = data?.getMyOrders?.list ?? [];
+
 	return (
 		<div className="profile-orders">
 			<h2>Buyurtmalar</h2>
 
-			<div className="orders-list">
-				{mockOrders.map((order) => (
-					<div key={order._id} className="order-card">
-						<div className="order-info">
-							<p className="order-number">{order.orderNumber}</p>
-							<p className="order-date">{order.createdAt}</p>
+			{loading ? (
+				<p className="loading-text">Yuklanmoqda...</p>
+			) : orders.length > 0 ? (
+				<div className="orders-list">
+					{orders.map((order) => (
+						<div key={order.id} className="order-card">
+							<div className="order-info">
+								<p className="order-number">{order.orderNumber}</p>
+								<p className="order-date">{new Date(order.createdAt).toLocaleDateString()}</p>
+							</div>
+
+							<span className="order-status" style={{ background: STATUS_COLORS[order.status] ?? '#999' }}>
+								{order.status}
+							</span>
+
+							<p className="order-total">₩{order.total.toLocaleString()}</p>
 						</div>
-
-						<span className="order-status" style={{ background: STATUS_COLORS[order.orderStatus] }}>
-							{order.orderStatus}
-						</span>
-
-						<p className="order-total">₩{order.orderTotal.toLocaleString()}</p>
-					</div>
-				))}
-			</div>
+					))}
+				</div>
+			) : (
+				<p className="empty-text">Buyurtmalar mavjud emas</p>
+			)}
 		</div>
 	);
 };

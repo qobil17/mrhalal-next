@@ -1,23 +1,52 @@
 import { useState } from 'react';
 import type { NextPage } from 'next';
+import Link from 'next/link';
+import { useQuery, useReactiveVar } from '@apollo/client';
 import { withLayoutHome } from '../../libs/components/layout/LayoutHome';
 import ProfileInfo from '../../libs/components/member/ProfileInfo';
 import ProfileAddress from '../../libs/components/member/ProfileAddress';
 import ProfileOrders from '../../libs/components/member/ProfileOrders';
 import ProfileWishlist from '../../libs/components/member/ProfileWishlist';
+import { GET_MY_PROFILE } from '../../apollo/user/query';
+import { logOut } from '../../libs/auth';
+import { userVar } from '../../apollo/client';
+import type { Member } from '../../libs/types/member/member';
 
 type ProfileTab = 'info' | 'address' | 'orders' | 'wishlist';
 
-const mockUser = {
-	firstName: 'Qobilbek',
-	lastName: 'Ibrohimov',
-	phone: '+82 10-9643-4477',
-	memberImage: '',
-};
-
 const ProfilePage: NextPage = () => {
 	const [activeTab, setActiveTab] = useState<ProfileTab>('info');
-	const { firstName, lastName, phone } = mockUser;
+	const user = useReactiveVar(userVar) as Member | null;
+
+	const { data, loading } = useQuery<{ getMyProfile: Member }>(GET_MY_PROFILE, {
+		skip: !user,
+	});
+
+	if (!user) {
+		return (
+			<div className="profile-page">
+				<div className="container">
+					<div className="cart-empty">
+						<span>🔒</span>
+						<p>Profilni ko&apos;rish uchun tizimga kiring</p>
+						<Link href="/auth">Tizimga kirish</Link>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	if (loading || !data?.getMyProfile) {
+		return (
+			<div className="profile-page">
+				<div className="container">
+					<p className="loading-text">Yuklanmoqda...</p>
+				</div>
+			</div>
+		);
+	}
+
+	const profile = data.getMyProfile;
 
 	return (
 		<div className="profile-page">
@@ -28,9 +57,9 @@ const ProfilePage: NextPage = () => {
 							<div className="sidebar-avatar">👤</div>
 							<div className="sidebar-user-info">
 								<strong>
-									{firstName} {lastName}
+									{profile.firstName} {profile.lastName}
 								</strong>
-								<span>{phone}</span>
+								<span>{profile.phone}</span>
 							</div>
 						</div>
 						<div className="sidebar-divider" />
@@ -70,7 +99,7 @@ const ProfilePage: NextPage = () => {
 								</button>
 							</nav>
 							<div className="sidebar-divider" />
-							<button type="button" className="sidebar-logout">
+							<button type="button" className="sidebar-logout" onClick={logOut}>
 								<span className="nav-icon">🚪</span>
 								<span>Chiqish</span>
 							</button>
@@ -78,7 +107,7 @@ const ProfilePage: NextPage = () => {
 					</aside>
 
 					<main className="profile-content">
-						{activeTab === 'info' && <ProfileInfo user={mockUser} />}
+						{activeTab === 'info' && <ProfileInfo user={profile} />}
 						{activeTab === 'address' && <ProfileAddress />}
 						{activeTab === 'orders' && <ProfileOrders />}
 						{activeTab === 'wishlist' && <ProfileWishlist />}

@@ -43,11 +43,21 @@
 	font-size: 14px;
 	color: #333;
 
-	input[type='checkbox'] {
+	input[type='checkbox'],
+	input[type='radio'] {
 		accent-color: #cc1b1b;
 		width: 16px;
 		height: 16px;
 	}
+}
+
+.filter-search {
+	width: 100%;
+	padding: 8px 10px;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	font-size: 13px;
+	margin-bottom: 8px;
 }
 
 .price-inputs {

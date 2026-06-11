@@ -1,31 +1,43 @@
-import { useState } from 'react';
+import { useQuery, useMutation } from '@apollo/client';
 import ProductCard from '../products/ProductCard';
-import { mockProducts } from '../../data/mockProducts';
+import { GET_MY_WISHLIST } from '../../../apollo/user/query';
+import { REMOVE_FROM_WISHLIST } from '../../../apollo/user/mutation';
+import type { WishlistItem } from '../../types/wishlist/wishlist';
+
+interface WishlistResponse {
+	items: WishlistItem[];
+	total: number;
+}
 
 const ProfileWishlist = () => {
-	const [wishlist, setWishlist] = useState(mockProducts.slice(0, 4));
+	const { data, loading } = useQuery<{ getMyWishlist: WishlistResponse }>(GET_MY_WISHLIST);
+	const [removeFromWishlist] = useMutation(REMOVE_FROM_WISHLIST, { refetchQueries: [{ query: GET_MY_WISHLIST }] });
 
-	const handleRemove = (id: string) => {
-		setWishlist((prev) => prev.filter((product) => product._id !== id));
+	const items = data?.getMyWishlist?.items ?? [];
+
+	const handleRemove = (productId: string) => {
+		removeFromWishlist({ variables: { productId: Number(productId) } });
 	};
 
 	return (
 		<div className="profile-wishlist">
 			<h2>Wishlist</h2>
 
-			{wishlist.length > 0 ? (
+			{loading ? (
+				<p className="loading-text">Yuklanmoqda...</p>
+			) : items.length > 0 ? (
 				<div className="wishlist-grid">
-					{wishlist.map((product) => (
-						<div key={product._id} className="wishlist-item">
-							<ProductCard product={product} />
-							<button type="button" className="wishlist-remove-btn" onClick={() => handleRemove(product._id)}>
+					{items.map((item) => (
+						<div key={item.id} className="wishlist-item">
+							<ProductCard product={item.product} />
+							<button type="button" className="wishlist-remove-btn" onClick={() => handleRemove(item.productId)}>
 								Ro&apos;yxatdan o&apos;chirish
 							</button>
 						</div>
 					))}
 				</div>
 			) : (
-				<p>Wishlist bo&apos;sh</p>
+				<p className="empty-text">Wishlist bo&apos;sh</p>
 			)}
 		</div>
 	);

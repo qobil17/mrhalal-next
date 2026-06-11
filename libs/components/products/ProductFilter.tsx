@@ -1,80 +1,107 @@
 import { useState } from 'react';
-import { ProductUnit } from '../../enums/product.enum';
+import { Category } from '../../types/category/category';
 
 export interface ProductFilters {
-	categories: string[];
-	units: string[];
+	categoryId?: number;
+	unit?: string;
 	minPrice: string;
 	maxPrice: string;
+	search: string;
 }
 
 interface ProductFilterProps {
+	categories: Category[];
 	onFilter: (filters: ProductFilters) => void;
 }
 
-const CATEGORIES = ["Mol go'shti", "Qo'y go'shti", 'Tovuq', 'Baliq', 'Oziq-ovqat', 'Ziravorlar'];
-const UNITS = Object.values(ProductUnit);
+const UNITS = ['KG', 'G', 'L', 'ML', 'PIECE'];
 
 export const initialProductFilters: ProductFilters = {
-	categories: [],
-	units: [],
+	categoryId: undefined,
+	unit: undefined,
 	minPrice: '',
 	maxPrice: '',
+	search: '',
 };
 
-const ProductFilter = ({ onFilter }: ProductFilterProps) => {
-	const [categories, setCategories] = useState<string[]>([]);
-	const [units, setUnits] = useState<string[]>([]);
+const ProductFilter = ({ categories, onFilter }: ProductFilterProps) => {
+	const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
+	const [unit, setUnit] = useState<string | undefined>(undefined);
 	const [minPrice, setMinPrice] = useState('');
 	const [maxPrice, setMaxPrice] = useState('');
+	const [search, setSearch] = useState('');
 
-	const toggleCategory = (category: string) => {
-		const next = categories.includes(category) ? categories.filter((item) => item !== category) : [...categories, category];
-
-		setCategories(next);
-		onFilter({ categories: next, units, minPrice, maxPrice });
+	const selectCategory = (id: number | undefined) => {
+		setCategoryId(id);
+		onFilter({ categoryId: id, unit, minPrice, maxPrice, search });
 	};
 
-	const toggleUnit = (unit: string) => {
-		const next = units.includes(unit) ? units.filter((item) => item !== unit) : [...units, unit];
-
-		setUnits(next);
-		onFilter({ categories, units: next, minPrice, maxPrice });
+	const selectUnit = (value: string | undefined) => {
+		setUnit(value);
+		onFilter({ categoryId, unit: value, minPrice, maxPrice, search });
 	};
 
 	const handleMinPrice = (value: string) => {
 		setMinPrice(value);
-		onFilter({ categories, units, minPrice: value, maxPrice });
+		onFilter({ categoryId, unit, minPrice: value, maxPrice, search });
 	};
 
 	const handleMaxPrice = (value: string) => {
 		setMaxPrice(value);
-		onFilter({ categories, units, minPrice, maxPrice: value });
+		onFilter({ categoryId, unit, minPrice, maxPrice: value, search });
+	};
+
+	const handleSearch = (value: string) => {
+		setSearch(value);
+		onFilter({ categoryId, unit, minPrice, maxPrice, search: value });
 	};
 
 	const handleClear = () => {
-		setCategories([]);
-		setUnits([]);
+		setCategoryId(undefined);
+		setUnit(undefined);
 		setMinPrice('');
 		setMaxPrice('');
+		setSearch('');
 		onFilter(initialProductFilters);
 	};
 
 	return (
 		<div className="product-filter">
+			<h4>Qidiruv</h4>
+			<input
+				type="text"
+				className="filter-search"
+				placeholder="Mahsulot qidirish..."
+				value={search}
+				onChange={(e) => handleSearch(e.target.value)}
+			/>
+
 			<h4>Kategoriya</h4>
-			{CATEGORIES.map((category) => (
-				<label key={category} className="filter-item">
-					<input type="checkbox" checked={categories.includes(category)} onChange={() => toggleCategory(category)} />
-					{category}
+			<label className="filter-item">
+				<input type="radio" name="category" checked={categoryId === undefined} onChange={() => selectCategory(undefined)} />
+				Barchasi
+			</label>
+			{categories.map((category) => (
+				<label key={category.id} className="filter-item">
+					<input
+						type="radio"
+						name="category"
+						checked={categoryId === Number(category.id)}
+						onChange={() => selectCategory(Number(category.id))}
+					/>
+					{category.nameUz}
 				</label>
 			))}
 
 			<h4>Birlik</h4>
-			{UNITS.map((unit) => (
-				<label key={unit} className="filter-item">
-					<input type="checkbox" checked={units.includes(unit)} onChange={() => toggleUnit(unit)} />
-					{unit}
+			<label className="filter-item">
+				<input type="radio" name="unit" checked={unit === undefined} onChange={() => selectUnit(undefined)} />
+				Barchasi
+			</label>
+			{UNITS.map((unitOption) => (
+				<label key={unitOption} className="filter-item">
+					<input type="radio" name="unit" checked={unit === unitOption} onChange={() => selectUnit(unitOption)} />
+					{unitOption}
 				</label>
 			))}
 

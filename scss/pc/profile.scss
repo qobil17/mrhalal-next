@@ -216,6 +216,16 @@
 		&:hover {
 			background: #aa1515;
 		}
+
+		&:disabled {
+			opacity: 0.6;
+			cursor: not-allowed;
+		}
+	}
+
+	.form-message {
+		font-size: 13px;
+		color: #1a9e6b;
 	}
 
 	.address-list {
@@ -246,6 +256,12 @@
 		color: #666;
 	}
 
+	.address-phone {
+		font-size: 13px;
+		color: #999;
+		margin-top: 4px;
+	}
+
 	.default-badge {
 		display: inline-block;
 		background: #cc1b1b;
@@ -254,6 +270,34 @@
 		padding: 2px 8px;
 		border-radius: 20px;
 		margin-left: 8px;
+	}
+
+	.address-actions {
+		display: flex;
+		gap: 8px;
+		margin-top: 12px;
+	}
+
+	.address-action-btn {
+		padding: 6px 14px;
+		background: none;
+		border: 1px solid #ddd;
+		border-radius: 6px;
+		color: #666;
+		cursor: pointer;
+		font-size: 13px;
+
+		&:hover {
+			border-color: #cc1b1b;
+			color: #cc1b1b;
+		}
+	}
+
+	.empty-text {
+		color: #999;
+		font-size: 14px;
+		text-align: center;
+		padding: 32px 0;
 	}
 
 	.add-address-btn {

@@ -1,62 +1,68 @@
-import { useState } from 'react';
 import type { NextPage } from 'next';
 import Link from 'next/link';
+import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
 import { withLayoutHome } from '../../libs/components/layout/LayoutHome';
-import CartItem, { CartItemType } from '../../libs/components/cart/CartItem';
+import CartItem from '../../libs/components/cart/CartItem';
+import { GET_MY_CART } from '../../apollo/user/query';
+import { UPDATE_CART_ITEM, REMOVE_FROM_CART, CLEAR_CART } from '../../apollo/user/mutation';
+import { userVar } from '../../apollo/client';
+import type { Member } from '../../libs/types/member/member';
+import type { Cart } from '../../libs/types/cart/cart';
 
 const DELIVERY_FEE = 3000;
 
-const initialCartItems: CartItemType[] = [
-	{
-		_id: '1',
-		productId: 'p1',
-		productName: "Mol go'shti (faqat go'sht)",
-		productUnit: '1 kg',
-		productPrice: 85000,
-		quantity: 2,
-		productImage: '',
-		emoji: '🥩',
-	},
-	{
-		_id: '2',
-		productId: 'p2',
-		productName: 'Tovuq filesi',
-		productUnit: '1 kg',
-		productPrice: 45000,
-		quantity: 1,
-		productImage: '',
-		emoji: '🍗',
-	},
-	{
-		_id: '3',
-		productId: 'p3',
-		productName: 'Guruch (Lazer)',
-		productUnit: '5 kg',
-		productPrice: 120000,
-		quantity: 1,
-		productImage: '',
-		emoji: '🛒',
-	},
-];
-
 const CartPage: NextPage = () => {
-	const [cartItems, setCartItems] = useState<CartItemType[]>(initialCartItems);
+	const user = useReactiveVar(userVar) as Member | null;
 
-	const handleQuantityChange = (id: string, delta: number) => {
-		setCartItems((prev) =>
-			prev.map((item) => (item._id === id ? { ...item, quantity: Math.min(99, Math.max(1, item.quantity + delta)) } : item)),
-		);
+	const { data, loading } = useQuery<{ getMyCart: Cart }>(GET_MY_CART, {
+		skip: !user,
+	});
+
+	const [updateCartItem] = useMutation(UPDATE_CART_ITEM, { refetchQueries: [{ query: GET_MY_CART }] });
+	const [removeFromCart] = useMutation(REMOVE_FROM_CART, { refetchQueries: [{ query: GET_MY_CART }] });
+	const [clearCart] = useMutation(CLEAR_CART, { refetchQueries: [{ query: GET_MY_CART }] });
+
+	const handleQuantityChange = (id: string, quantity: number) => {
+		updateCartItem({ variables: { input: { itemId: Number(id), quantity } } });
 	};
 
 	const handleRemoveItem = (id: string) => {
-		setCartItems((prev) => prev.filter((item) => item._id !== id));
+		removeFromCart({ variables: { itemId: Number(id) } });
 	};
 
 	const handleClearCart = () => {
-		setCartItems([]);
+		clearCart();
 	};
 
-	const subtotal = cartItems.reduce((sum, item) => sum + item.productPrice * item.quantity, 0);
+	if (!user) {
+		return (
+			<div className="cart-page">
+				<div className="container">
+					<h1 className="cart-title">Savat</h1>
+					<div className="cart-empty">
+						<span>🔒</span>
+						<p>Savatni ko&apos;rish uchun tizimga kiring</p>
+						<Link href="/auth">Tizimga kirish</Link>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	if (loading) {
+		return (
+			<div className="cart-page">
+				<div className="container">
+					<h1 className="cart-title">Savat</h1>
+					<p className="loading-text">Yuklanmoqda...</p>
+				</div>
+			</div>
+		);
+	}
+
+	const cart = data?.getMyCart;
+	const items = cart?.items ?? [];
+	const subtotal = cart?.total ?? 0;
 	const total = subtotal + DELIVERY_FEE;
 
 	return (
@@ -64,11 +70,11 @@ const CartPage: NextPage = () => {
 			<div className="container">
 				<h1 className="cart-title">Savat</h1>
 
-				{cartItems.length > 0 && (
+				{items.length > 0 && (
 					<div className="cart-layout">
 						<div className="cart-items">
-							{cartItems.map((item) => (
-								<CartItem key={item._id} item={item} onQuantityChange={handleQuantityChange} onRemove={handleRemoveItem} />
+							{items.map((item) => (
+								<CartItem key={item.id} item={item} onQuantityChange={handleQuantityChange} onRemove={handleRemoveItem} />
 							))}
 
 							<button type="button" className="cart-clear-btn" onClick={handleClearCart}>
@@ -107,7 +113,7 @@ const CartPage: NextPage = () => {
 					</div>
 				)}
 
-				{cartItems.length === 0 && (
+				{items.length === 0 && (
 					<div className="cart-empty">
 						<span>🛒</span>
 						<p>Savat bo&apos;sh</p>

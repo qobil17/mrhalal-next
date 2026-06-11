@@ -18,6 +18,7 @@
 	justify-content: center;
 	font-size: 120px;
 	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+	overflow: hidden;
 }
 
 .product-detail-unit {
@@ -36,6 +37,19 @@
 	font-weight: 700;
 	color: #222;
 	margin-bottom: 16px;
+}
+
+.product-detail-desc {
+	font-size: 14px;
+	color: #666;
+	line-height: 1.6;
+	margin-bottom: 24px;
+}
+
+.product-detail-message {
+	font-size: 13px;
+	color: #1a9e6b;
+	margin-bottom: 12px;
 }
 
 .product-detail-price {
@@ -90,6 +104,11 @@
 
 	&:hover {
 		background: #aa1515;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
 	}
 }
 

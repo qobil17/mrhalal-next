@@ -1,23 +1,36 @@
-import { ProductUnit, ProductStatus } from '../../enums/product.enum';
+export interface ProductImage {
+	id: string;
+	url: string;
+	isPrimary: boolean;
+}
 
 export interface Product {
 	id: string;
-	productName: string;
-	productUnit: ProductUnit;
-	productPrice: number;
-	productImage: string;
-	productDesc?: string;
-	productStatus: ProductStatus;
-	productLeftCount: number;
-	createdAt: Date;
+	nameUz: string;
+	nameKo: string;
+	nameEn: string;
+	nameAr: string;
+	slug: string;
+	price: number;
+	comparePrice?: number;
+	unit: string;
+	stockQuantity: number;
+	images: ProductImage[];
+	categoryId: number;
+	isActive: boolean;
+	isFeatured: boolean;
+	soldCount: number;
+	viewCount: number;
+	averageRating: number;
+	reviewCount: number;
+	descriptionUz?: string;
+	descriptionKo?: string;
+	createdAt: string;
 }
 
-export interface ProductCard {
-	_id: string;
-	productName: string;
-	productUnit: string;
-	productPrice: number;
-	productImage: string;
-	productLeftCount: number;
-	productStatus: string;
+export interface ProductsResponse {
+	list: Product[];
+	total: number;
+	page: number;
+	limit: number;
 }
