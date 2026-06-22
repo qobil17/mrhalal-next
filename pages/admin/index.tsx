@@ -1,14 +1,37 @@
 import type { NextPage } from 'next';
+import { useQuery } from '@apollo/client';
 import { withLayoutAdmin } from '../../libs/components/layout/LayoutAdmin';
+import { GET_ALL_PRODUCTS_BY_ADMIN, GET_ALL_ORDERS_BY_ADMIN, GET_ALL_MEMBERS_BY_ADMIN } from '../../apollo/admin/query';
+import type { ProductsResponse } from '../../libs/types/product/product';
+import type { OrdersResponse } from '../../libs/types/order/order';
 
-const stats = [
-	{ icon: '🥩', label: 'Mahsulotlar', value: '24' },
-	{ icon: '📦', label: 'Buyurtmalar', value: '156' },
-	{ icon: '👥', label: 'Foydalanuvchilar', value: '89' },
-	{ icon: '💰', label: 'Daromad', value: '4 250 000 ₩' },
-];
+interface MembersTotal {
+	total: number;
+}
 
 const AdminDashboardPage: NextPage = () => {
+	const { data: productsData } = useQuery<{ getAllProductsByAdmin: ProductsResponse }>(GET_ALL_PRODUCTS_BY_ADMIN, {
+		variables: { input: { page: 1, limit: 1 } },
+	});
+	const { data: ordersData } = useQuery<{ getAllOrdersByAdmin: OrdersResponse }>(GET_ALL_ORDERS_BY_ADMIN, {
+		variables: { input: { page: 1, limit: 100 } },
+	});
+	const { data: membersData } = useQuery<{ getAllMembersByAdmin: MembersTotal }>(GET_ALL_MEMBERS_BY_ADMIN, {
+		variables: { input: { page: 1, limit: 1 } },
+	});
+
+	const orders = ordersData?.getAllOrdersByAdmin?.list ?? [];
+	const revenue = orders
+		.filter((order) => order.status !== 'CANCELLED')
+		.reduce((sum, order) => sum + order.total, 0);
+
+	const stats = [
+		{ icon: '🥩', label: 'Mahsulotlar', value: String(productsData?.getAllProductsByAdmin?.total ?? 0) },
+		{ icon: '📦', label: 'Buyurtmalar', value: String(ordersData?.getAllOrdersByAdmin?.total ?? 0) },
+		{ icon: '👥', label: 'Foydalanuvchilar', value: String(membersData?.getAllMembersByAdmin?.total ?? 0) },
+		{ icon: '💰', label: 'Daromad', value: `${revenue.toLocaleString()} ₩` },
+	];
+
 	return (
 		<div className="admin-page">
 			<h1 className="admin-page-title">Dashboard</h1>

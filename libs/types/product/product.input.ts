@@ -3,7 +3,6 @@ export interface ProductsInquiry {
 	limit: number;
 	search?: string;
 	categoryId?: number;
-	unit?: string;
 	minPrice?: number;
 	maxPrice?: number;
 }

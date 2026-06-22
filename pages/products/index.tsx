@@ -44,7 +44,6 @@ const ProductsPage: NextPage = () => {
 				page: 1,
 				limit,
 				...(categoryId !== undefined && { categoryId }),
-				...(filters.unit && { unit: filters.unit }),
 				...(filters.minPrice && { minPrice: Number(filters.minPrice) }),
 				...(filters.maxPrice && { maxPrice: Number(filters.maxPrice) }),
 				...(filters.search && { search: filters.search }),

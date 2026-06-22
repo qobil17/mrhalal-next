@@ -3,7 +3,6 @@ import { Category } from '../../types/category/category';
 
 export interface ProductFilters {
 	categoryId?: number;
-	unit?: string;
 	minPrice: string;
 	maxPrice: string;
 	search: string;
@@ -14,11 +13,8 @@ interface ProductFilterProps {
 	onFilter: (filters: ProductFilters) => void;
 }
 
-const UNITS = ['KG', 'G', 'L', 'ML', 'PIECE'];
-
 export const initialProductFilters: ProductFilters = {
 	categoryId: undefined,
-	unit: undefined,
 	minPrice: '',
 	maxPrice: '',
 	search: '',
@@ -26,39 +22,32 @@ export const initialProductFilters: ProductFilters = {
 
 const ProductFilter = ({ categories, onFilter }: ProductFilterProps) => {
 	const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
-	const [unit, setUnit] = useState<string | undefined>(undefined);
 	const [minPrice, setMinPrice] = useState('');
 	const [maxPrice, setMaxPrice] = useState('');
 	const [search, setSearch] = useState('');
 
 	const selectCategory = (id: number | undefined) => {
 		setCategoryId(id);
-		onFilter({ categoryId: id, unit, minPrice, maxPrice, search });
-	};
-
-	const selectUnit = (value: string | undefined) => {
-		setUnit(value);
-		onFilter({ categoryId, unit: value, minPrice, maxPrice, search });
+		onFilter({ categoryId: id, minPrice, maxPrice, search });
 	};
 
 	const handleMinPrice = (value: string) => {
 		setMinPrice(value);
-		onFilter({ categoryId, unit, minPrice: value, maxPrice, search });
+		onFilter({ categoryId, minPrice: value, maxPrice, search });
 	};
 
 	const handleMaxPrice = (value: string) => {
 		setMaxPrice(value);
-		onFilter({ categoryId, unit, minPrice, maxPrice: value, search });
+		onFilter({ categoryId, minPrice, maxPrice: value, search });
 	};
 
 	const handleSearch = (value: string) => {
 		setSearch(value);
-		onFilter({ categoryId, unit, minPrice, maxPrice, search: value });
+		onFilter({ categoryId, minPrice, maxPrice, search: value });
 	};
 
 	const handleClear = () => {
 		setCategoryId(undefined);
-		setUnit(undefined);
 		setMinPrice('');
 		setMaxPrice('');
 		setSearch('');
@@ -90,18 +79,6 @@ const ProductFilter = ({ categories, onFilter }: ProductFilterProps) => {
 						onChange={() => selectCategory(Number(category.id))}
 					/>
 					{category.nameUz}
-				</label>
-			))}
-
-			<h4>Birlik</h4>
-			<label className="filter-item">
-				<input type="radio" name="unit" checked={unit === undefined} onChange={() => selectUnit(undefined)} />
-				Barchasi
-			</label>
-			{UNITS.map((unitOption) => (
-				<label key={unitOption} className="filter-item">
-					<input type="radio" name="unit" checked={unit === unitOption} onChange={() => selectUnit(unitOption)} />
-					{unitOption}
 				</label>
 			))}
 

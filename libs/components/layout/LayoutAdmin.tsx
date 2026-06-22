@@ -1,10 +1,12 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { useReactiveVar } from '@apollo/client';
 import { removeJwtToken } from '../../auth';
-import { userVar } from '../../../apollo/client';
+import { authReadyVar, userVar } from '../../../apollo/client';
+import type { Member } from '../../types/member/member';
 
 interface LayoutAdminProps {
 	children: ReactNode;
@@ -20,12 +22,39 @@ const adminNavItems = [
 
 const LayoutAdmin = ({ children }: LayoutAdminProps) => {
 	const router = useRouter();
+	const authReady = useReactiveVar(authReadyVar);
+	const user = useReactiveVar(userVar) as Member | null;
+	const authorized = authReady && !!user && user.role === 'ADMIN';
+
+	useEffect(() => {
+		// Session is still being rehydrated from localStorage - don't make any
+		// auth decision yet, otherwise we'd race the rehydration and redirect
+		// an actual admin away before their role is even known.
+		if (!authReady) return;
+
+		if (!user) {
+			router.replace('/auth');
+			return;
+		}
+
+		if (user.role !== 'ADMIN') {
+			router.replace('/');
+		}
+	}, [authReady, user, router]);
 
 	const handleLogout = () => {
 		removeJwtToken();
 		userVar(null);
 		window.location.href = '/';
 	};
+
+	if (!authorized) {
+		return (
+			<div id="pc-wrap">
+				<p className="loading-text">Yuklanmoqda...</p>
+			</div>
+		);
+	}
 
 	return (
 		<div id="pc-wrap">

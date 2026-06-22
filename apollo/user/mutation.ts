@@ -51,6 +51,7 @@ const CART_FIELDS = `
 			id
 			nameUz
 			nameKo
+			nameEn
 			price
 			unit
 			images {
@@ -101,6 +102,7 @@ const WISHLIST_FIELDS = `
 			id
 			nameUz
 			nameKo
+			nameEn
 			price
 			unit
 			slug
@@ -126,6 +128,23 @@ export const REMOVE_FROM_WISHLIST = gql`
 	mutation RemoveFromWishlist($productId: Int!) {
 		removeFromWishlist(productId: $productId) {
 			${WISHLIST_FIELDS}
+		}
+	}
+`;
+
+/** REVIEW **/
+export const CREATE_REVIEW = gql`
+	mutation CreateReview($input: CreateReviewInput!) {
+		createReview(input: $input) {
+			id
+			rating
+			comment
+			createdAt
+			member {
+				id
+				firstName
+				avatar
+			}
 		}
 	}
 `;

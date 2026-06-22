@@ -3,6 +3,7 @@ export interface Category {
 	nameUz: string;
 	nameKo: string;
 	nameEn: string;
+	nameAr?: string;
 	slug: string;
 	image?: string;
 	isActive: boolean;

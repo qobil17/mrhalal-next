@@ -1,5 +1,7 @@
 import Image from 'next/image';
+import { useReactiveVar } from '@apollo/client';
 import { CartItem as CartItemType } from '../../types/cart/cart';
+import { getLocalizedName, langVar } from '../../i18n';
 
 interface CartItemProps {
 	item: CartItemType;
@@ -19,6 +21,8 @@ const DEFAULT_EMOJI = '🛒';
 
 const CartItem = ({ item, onQuantityChange, onRemove }: CartItemProps) => {
 	const { id, quantity, subtotal, product } = item;
+	const lang = useReactiveVar(langVar);
+	const name = getLocalizedName(product, lang);
 
 	const primaryImage = product.images.find((image) => image.isPrimary)?.url ?? product.images[0]?.url;
 	const fallbackEmoji = UNIT_EMOJI[product.unit] ?? DEFAULT_EMOJI;
@@ -29,7 +33,7 @@ const CartItem = ({ item, onQuantityChange, onRemove }: CartItemProps) => {
 				{primaryImage ? (
 					<Image
 						src={primaryImage}
-						alt={product.nameUz}
+						alt={name}
 						width={80}
 						height={80}
 						style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -40,7 +44,7 @@ const CartItem = ({ item, onQuantityChange, onRemove }: CartItemProps) => {
 			</div>
 
 			<div className="cart-item-info">
-				<p className="cart-item-name">{product.nameUz}</p>
+				<p className="cart-item-name">{name}</p>
 				<span className="cart-item-unit">{product.unit}</span>
 			</div>
 

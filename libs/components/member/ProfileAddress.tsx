@@ -1,10 +1,36 @@
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_MY_ADDRESSES } from '../../../apollo/user/query';
-import { DELETE_ADDRESS, SET_DEFAULT_ADDRESS } from '../../../apollo/user/mutation';
+import { CREATE_ADDRESS, DELETE_ADDRESS, SET_DEFAULT_ADDRESS } from '../../../apollo/user/mutation';
 import type { Address } from '../../types/address/address';
 
+interface AddressFormState {
+	recipientName: string;
+	phone: string;
+	addressLine1: string;
+	addressLine2: string;
+	city: string;
+	postalCode: string;
+}
+
+const EMPTY_FORM: AddressFormState = {
+	recipientName: '',
+	phone: '',
+	addressLine1: '',
+	addressLine2: '',
+	city: '',
+	postalCode: '',
+};
+
 const ProfileAddress = () => {
+	const [showForm, setShowForm] = useState(false);
+	const [form, setForm] = useState<AddressFormState>(EMPTY_FORM);
+
 	const { data, loading } = useQuery<{ getMyAddresses: Address[] }>(GET_MY_ADDRESSES);
+	const [createAddress, { loading: creating }] = useMutation(CREATE_ADDRESS, {
+		refetchQueries: [{ query: GET_MY_ADDRESSES }],
+	});
 	const [deleteAddress] = useMutation(DELETE_ADDRESS, { refetchQueries: [{ query: GET_MY_ADDRESSES }] });
 	const [setDefaultAddress] = useMutation(SET_DEFAULT_ADDRESS, { refetchQueries: [{ query: GET_MY_ADDRESSES }] });
 
@@ -16,6 +42,13 @@ const ProfileAddress = () => {
 
 	const handleSetDefault = (id: string) => {
 		setDefaultAddress({ variables: { id: Number(id) } });
+	};
+
+	const handleSubmit = async (e: FormEvent) => {
+		e.preventDefault();
+		await createAddress({ variables: { input: { ...form, addressLine2: form.addressLine2 || undefined } } });
+		setForm(EMPTY_FORM);
+		setShowForm(false);
 	};
 
 	return (
@@ -55,8 +88,64 @@ const ProfileAddress = () => {
 				<p className="empty-text">Manzillar mavjud emas</p>
 			)}
 
-			<button type="button" className="add-address-btn">
-				Yangi manzil qo&apos;shish
+			{showForm && (
+				<form className="profile-form" onSubmit={handleSubmit}>
+					<div className="form-group">
+						<label htmlFor="recipientName">Qabul qiluvchi</label>
+						<input
+							id="recipientName"
+							value={form.recipientName}
+							onChange={(e) => setForm({ ...form, recipientName: e.target.value })}
+							required
+						/>
+					</div>
+					<div className="form-group">
+						<label htmlFor="addrPhone">Telefon</label>
+						<input
+							id="addrPhone"
+							value={form.phone}
+							onChange={(e) => setForm({ ...form, phone: e.target.value })}
+							required
+						/>
+					</div>
+					<div className="form-group">
+						<label htmlFor="addressLine1">Manzil</label>
+						<input
+							id="addressLine1"
+							value={form.addressLine1}
+							onChange={(e) => setForm({ ...form, addressLine1: e.target.value })}
+							required
+						/>
+					</div>
+					<div className="form-group">
+						<label htmlFor="addressLine2">Manzil (qo&apos;shimcha)</label>
+						<input
+							id="addressLine2"
+							value={form.addressLine2}
+							onChange={(e) => setForm({ ...form, addressLine2: e.target.value })}
+						/>
+					</div>
+					<div className="form-group">
+						<label htmlFor="city">Shahar</label>
+						<input id="city" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} required />
+					</div>
+					<div className="form-group">
+						<label htmlFor="postalCode">Pochta indeksi</label>
+						<input
+							id="postalCode"
+							value={form.postalCode}
+							onChange={(e) => setForm({ ...form, postalCode: e.target.value })}
+							required
+						/>
+					</div>
+					<button type="submit" className="form-save-btn" disabled={creating}>
+						{creating ? 'Saqlanmoqda...' : 'Saqlash'}
+					</button>
+				</form>
+			)}
+
+			<button type="button" className="add-address-btn" onClick={() => setShowForm((prev) => !prev)}>
+				{showForm ? 'Bekor qilish' : "Yangi manzil qo'shish"}
 			</button>
 		</div>
 	);

@@ -6,6 +6,7 @@ export interface CartItem {
 		id: string;
 		nameUz: string;
 		nameKo: string;
+		nameEn?: string;
 		price: number;
 		unit: string;
 		images: { url: string; isPrimary: boolean }[];

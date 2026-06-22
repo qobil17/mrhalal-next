@@ -1,18 +1,23 @@
+import { useState } from 'react';
 import type { NextPage } from 'next';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
 import { withLayoutHome } from '../../libs/components/layout/LayoutHome';
 import CartItem from '../../libs/components/cart/CartItem';
-import { GET_MY_CART } from '../../apollo/user/query';
-import { UPDATE_CART_ITEM, REMOVE_FROM_CART, CLEAR_CART } from '../../apollo/user/mutation';
-import { userVar } from '../../apollo/client';
+import { GET_MY_CART, GET_MY_ORDERS } from '../../apollo/user/query';
+import { UPDATE_CART_ITEM, REMOVE_FROM_CART, CLEAR_CART, CREATE_ORDER } from '../../apollo/user/mutation';
+import { authReadyVar, userVar } from '../../apollo/client';
 import type { Member } from '../../libs/types/member/member';
 import type { Cart } from '../../libs/types/cart/cart';
 
 const DELIVERY_FEE = 3000;
 
 const CartPage: NextPage = () => {
+	const router = useRouter();
+	const authReady = useReactiveVar(authReadyVar);
 	const user = useReactiveVar(userVar) as Member | null;
+	const [checkoutError, setCheckoutError] = useState('');
 
 	const { data, loading } = useQuery<{ getMyCart: Cart }>(GET_MY_CART, {
 		skip: !user,
@@ -21,6 +26,9 @@ const CartPage: NextPage = () => {
 	const [updateCartItem] = useMutation(UPDATE_CART_ITEM, { refetchQueries: [{ query: GET_MY_CART }] });
 	const [removeFromCart] = useMutation(REMOVE_FROM_CART, { refetchQueries: [{ query: GET_MY_CART }] });
 	const [clearCart] = useMutation(CLEAR_CART, { refetchQueries: [{ query: GET_MY_CART }] });
+	const [createOrder, { loading: placingOrder }] = useMutation(CREATE_ORDER, {
+		refetchQueries: [{ query: GET_MY_CART }, { query: GET_MY_ORDERS, variables: { input: { page: 1, limit: 20 } } }],
+	});
 
 	const handleQuantityChange = (id: string, quantity: number) => {
 		updateCartItem({ variables: { input: { itemId: Number(id), quantity } } });
@@ -33,6 +41,30 @@ const CartPage: NextPage = () => {
 	const handleClearCart = () => {
 		clearCart();
 	};
+
+	const handleCheckout = async () => {
+		setCheckoutError('');
+
+		try {
+			await createOrder({ variables: { input: {} } });
+			router.push('/profile?tab=orders');
+		} catch (err) {
+			setCheckoutError(
+				err instanceof Error ? err.message : 'Buyurtma berishda xatolik yuz berdi, qayta urinib koʻring',
+			);
+		}
+	};
+
+	if (!authReady) {
+		return (
+			<div className="cart-page">
+				<div className="container">
+					<h1 className="cart-title">Savat</h1>
+					<p className="loading-text">Yuklanmoqda...</p>
+				</div>
+			</div>
+		);
+	}
 
 	if (!user) {
 		return (
@@ -102,8 +134,10 @@ const CartPage: NextPage = () => {
 								<span>₩{total.toLocaleString()}</span>
 							</div>
 
-							<button type="button" className="checkout-btn">
-								Buyurtma berish
+							{checkoutError && <p className="form-message" style={{ color: '#cc1b1b' }}>{checkoutError}</p>}
+
+							<button type="button" className="checkout-btn" onClick={handleCheckout} disabled={placingOrder}>
+								{placingOrder ? 'Yuborilmoqda...' : 'Buyurtma berish'}
 							</button>
 
 							<Link href="/products" className="continue-shopping">

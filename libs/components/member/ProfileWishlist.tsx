@@ -15,8 +15,8 @@ const ProfileWishlist = () => {
 
 	const items = data?.getMyWishlist?.items ?? [];
 
-	const handleRemove = (productId: string) => {
-		removeFromWishlist({ variables: { productId: Number(productId) } });
+	const handleRemove = (productId: number) => {
+		removeFromWishlist({ variables: { productId } });
 	};
 
 	return (

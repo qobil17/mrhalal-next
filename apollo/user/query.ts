@@ -24,6 +24,7 @@ export const GET_ALL_PRODUCTS = gql`
 				id
 				nameUz
 				nameKo
+				nameEn
 				price
 				comparePrice
 				unit
@@ -35,6 +36,7 @@ export const GET_ALL_PRODUCTS = gql`
 				averageRating
 				reviewCount
 				images {
+					id
 					url
 					isPrimary
 				}
@@ -53,6 +55,7 @@ export const GET_FEATURED_PRODUCTS = gql`
 			id
 			nameUz
 			nameKo
+			nameEn
 			price
 			comparePrice
 			unit
@@ -64,6 +67,7 @@ export const GET_FEATURED_PRODUCTS = gql`
 			averageRating
 			reviewCount
 			images {
+				id
 				url
 				isPrimary
 			}
@@ -136,6 +140,7 @@ export const GET_MY_CART = gql`
 					id
 					nameUz
 					nameKo
+					nameEn
 					price
 					unit
 					images {
@@ -177,6 +182,26 @@ export const GET_MY_ORDERS = gql`
 	}
 `;
 
+/** REVIEW **/
+export const GET_PRODUCT_REVIEWS = gql`
+	query GetProductReviews($productId: Int!, $input: ReviewsInquiry!) {
+		getProductReviews(productId: $productId, input: $input) {
+			list {
+				id
+				rating
+				comment
+				createdAt
+				member {
+					id
+					firstName
+					avatar
+				}
+			}
+			total
+		}
+	}
+`;
+
 /** ADDRESS **/
 export const GET_MY_ADDRESSES = gql`
 	query GetMyAddresses {
@@ -205,6 +230,7 @@ export const GET_MY_WISHLIST = gql`
 					id
 					nameUz
 					nameKo
+					nameEn
 					price
 					unit
 					slug

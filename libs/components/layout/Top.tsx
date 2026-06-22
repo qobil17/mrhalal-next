@@ -1,17 +1,25 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useReactiveVar } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import { userVar } from '../../../apollo/client';
 import { logOut } from '../../auth';
+import { GET_MY_CART } from '../../../apollo/user/query';
+import { langVar, setLang, t, type Lang } from '../../i18n';
 import type { Member } from '../../types/member/member';
+import type { Cart } from '../../types/cart/cart';
+
+const LANGUAGES: Lang[] = ['UZ', 'KO', 'EN'];
 
 const Top = () => {
 	const device = useDeviceDetect();
 	const [open, setOpen] = useState(false);
-	const cartCount = 3;
 	const user = useReactiveVar(userVar) as Member | null;
+	const lang = useReactiveVar(langVar);
+
+	const { data: cartData } = useQuery<{ getMyCart: Cart }>(GET_MY_CART, { skip: !user });
+	const cartCount = cartData?.getMyCart?.itemCount ?? 0;
 
 	if (device === 'mobile') {
 		return (
@@ -34,7 +42,7 @@ const Top = () => {
 							</Link>
 						) : (
 							<Link href="/auth" className="auth-btn">
-								Login
+								{t('login', lang)}
 							</Link>
 						)}
 
@@ -47,24 +55,31 @@ const Top = () => {
 				{open && (
 					<div className="mobile-menu">
 						<Link href="/" onClick={() => setOpen(false)}>
-							Home
+							{t('home', lang)}
 						</Link>
 						<Link href="/products" onClick={() => setOpen(false)}>
-							Products
+							{t('products', lang)}
 						</Link>
 						<Link href="/about" onClick={() => setOpen(false)}>
-							About
+							{t('about', lang)}
 						</Link>
 
 						<div className="lang-switcher">
-							<button>UZ</button>
-							<button>KO</button>
-							<button>EN</button>
+							{LANGUAGES.map((code) => (
+								<button
+									key={code}
+									type="button"
+									className={code === lang ? 'active' : ''}
+									onClick={() => setLang(code)}
+								>
+									{code}
+								</button>
+							))}
 						</div>
 
 						{user && (
 							<button className="mobile-logout-btn" onClick={logOut}>
-								Chiqish
+								{t('logout', lang)}
 							</button>
 						)}
 					</div>
@@ -81,9 +96,9 @@ const Top = () => {
 				</Link>
 
 				<div className="nav-links">
-					<Link href="/">Home</Link>
-					<Link href="/products">Products</Link>
-					<Link href="/about">About</Link>
+					<Link href="/">{t('home', lang)}</Link>
+					<Link href="/products">{t('products', lang)}</Link>
+					<Link href="/about">{t('about', lang)}</Link>
 				</div>
 
 				<div className="nav-right">
@@ -93,9 +108,16 @@ const Top = () => {
 					</Link>
 
 					<div className="lang-switcher">
-						<button>UZ</button>
-						<button>KO</button>
-						<button>EN</button>
+						{LANGUAGES.map((code) => (
+							<button
+								key={code}
+								type="button"
+								className={code === lang ? 'active' : ''}
+								onClick={() => setLang(code)}
+							>
+								{code}
+							</button>
+						))}
 					</div>
 
 					{user ? (
@@ -105,12 +127,12 @@ const Top = () => {
 								<span className="profile-nav-name">{user.firstName}</span>
 							</Link>
 							<button className="nav-logout-btn" onClick={logOut}>
-								Chiqish
+								{t('logout', lang)}
 							</button>
 						</div>
 					) : (
 						<Link href="/auth" className="auth-btn">
-							Login
+							{t('login', lang)}
 						</Link>
 					)}
 				</div>

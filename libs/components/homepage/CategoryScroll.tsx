@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { useReactiveVar } from '@apollo/client';
 import { Category } from '../../types/category/category';
+import { getLocalizedName, langVar, t } from '../../i18n';
 
 interface FallbackCategory {
 	id: number;
@@ -39,10 +41,11 @@ interface CategoryScrollProps {
 
 const CategoryScroll = ({ categories }: CategoryScrollProps) => {
 	const items = categories && categories.length > 0 ? categories : null;
+	const lang = useReactiveVar(langVar);
 
 	return (
 		<section className="category-scroll-section">
-			<h3>Kategoriyalar</h3>
+			<h3>{t('categories', lang)}</h3>
 			<div className="category-scroll">
 				{items
 					? items.map((category) => (
@@ -51,7 +54,7 @@ const CategoryScroll = ({ categories }: CategoryScrollProps) => {
 									{category.image ? (
 										<Image
 											src={category.image}
-											alt={category.nameUz}
+											alt={getLocalizedName(category, lang)}
 											width={48}
 											height={48}
 											style={{ objectFit: 'cover', borderRadius: '50%' }}
@@ -60,15 +63,13 @@ const CategoryScroll = ({ categories }: CategoryScrollProps) => {
 										SLUG_EMOJI[category.slug] ?? DEFAULT_EMOJI
 									)}
 								</div>
-								<span className="category-name">{category.nameUz}</span>
-								<span className="category-name-ko">{category.nameKo}</span>
+								<span className="category-name">{getLocalizedName(category, lang)}</span>
 							</Link>
 						))
 					: FALLBACK_CATEGORIES.map((category) => (
 							<Link key={category.id} href={`/products?category=${category.slug}`} className="category-item">
 								<div className="category-icon">{category.emoji}</div>
-								<span className="category-name">{category.nameUz}</span>
-								<span className="category-name-ko">{category.nameKo}</span>
+								<span className="category-name">{getLocalizedName(category, lang)}</span>
 							</Link>
 						))}
 			</div>

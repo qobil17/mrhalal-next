@@ -1,5 +1,5 @@
 #pc-wrap {
-	nav {
+	.navbar {
 		background: #cc1b1b;
 		height: 70px;
 		position: sticky;
@@ -82,6 +82,12 @@
 
 				&:hover {
 					opacity: 0.8;
+				}
+
+				&.active {
+					background: #fff;
+					color: #cc1b1b;
+					font-weight: 700;
 				}
 			}
 		}

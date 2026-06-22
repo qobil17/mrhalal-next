@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { NextPage } from 'next';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useQuery, useReactiveVar } from '@apollo/client';
 import { withLayoutHome } from '../../libs/components/layout/LayoutHome';
 import ProfileInfo from '../../libs/components/member/ProfileInfo';
@@ -9,18 +10,40 @@ import ProfileOrders from '../../libs/components/member/ProfileOrders';
 import ProfileWishlist from '../../libs/components/member/ProfileWishlist';
 import { GET_MY_PROFILE } from '../../apollo/user/query';
 import { logOut } from '../../libs/auth';
-import { userVar } from '../../apollo/client';
+import { authReadyVar, userVar } from '../../apollo/client';
 import type { Member } from '../../libs/types/member/member';
 
 type ProfileTab = 'info' | 'address' | 'orders' | 'wishlist';
 
+const VALID_TABS: ProfileTab[] = ['info', 'address', 'orders', 'wishlist'];
+
 const ProfilePage: NextPage = () => {
+	const router = useRouter();
 	const [activeTab, setActiveTab] = useState<ProfileTab>('info');
+	const authReady = useReactiveVar(authReadyVar);
 	const user = useReactiveVar(userVar) as Member | null;
+
+	useEffect(() => {
+		const tab = router.query.tab;
+		if (typeof tab === 'string' && VALID_TABS.includes(tab as ProfileTab)) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
+			setActiveTab(tab as ProfileTab);
+		}
+	}, [router.query.tab]);
 
 	const { data, loading } = useQuery<{ getMyProfile: Member }>(GET_MY_PROFILE, {
 		skip: !user,
 	});
+
+	if (!authReady) {
+		return (
+			<div className="profile-page">
+				<div className="container">
+					<p className="loading-text">Yuklanmoqda...</p>
+				</div>
+			</div>
+		);
+	}
 
 	if (!user) {
 		return (

@@ -11,8 +11,8 @@ interface ProfileInfoProps {
 
 const ProfileInfo = ({ user }: ProfileInfoProps) => {
 	const [firstName, setFirstName] = useState(user.firstName);
-	const [lastName, setLastName] = useState(user.lastName);
-	const [email, setEmail] = useState(user.email);
+	const [lastName, setLastName] = useState(user.lastName ?? '');
+	const [email, setEmail] = useState(user.email ?? '');
 	const [message, setMessage] = useState('');
 
 	const [updateMyProfile, { loading }] = useMutation(UPDATE_MY_PROFILE);
@@ -22,10 +22,12 @@ const ProfileInfo = ({ user }: ProfileInfoProps) => {
 		setMessage('');
 
 		try {
-			await updateMyProfile({ variables: { input: { firstName, lastName, email } } });
+			await updateMyProfile({
+				variables: { input: { firstName, lastName: lastName || undefined, email: email || undefined } },
+			});
 			setMessage("Ma'lumotlar saqlandi");
-		} catch {
-			setMessage('Xatolik yuz berdi, qayta urinib koʻring');
+		} catch (err) {
+			setMessage(err instanceof Error ? err.message : 'Xatolik yuz berdi, qayta urinib koʻring');
 		}
 	};
 
