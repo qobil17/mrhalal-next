@@ -14,6 +14,11 @@ export const GET_ALL_PRODUCTS_BY_ADMIN = gql`
 				stockQuantity
 				isActive
 				isFeatured
+				images {
+					id
+					url
+					isPrimary
+				}
 			}
 			total
 			page

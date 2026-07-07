@@ -185,6 +185,14 @@ export const CREATE_ADDRESS = gql`
 	}
 `;
 
+export const UPDATE_ADDRESS = gql`
+	mutation UpdateAddress($input: UpdateAddressInput!) {
+		updateAddress(input: $input) {
+			${ADDRESS_FIELDS}
+		}
+	}
+`;
+
 export const DELETE_ADDRESS = gql`
 	mutation DeleteAddress($id: Int!) {
 		deleteAddress(id: $id)

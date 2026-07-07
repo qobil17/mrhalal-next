@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
+import Swal from 'sweetalert2';
 import { GET_MY_ADDRESSES } from '../../../apollo/user/query';
-import { CREATE_ADDRESS, DELETE_ADDRESS, SET_DEFAULT_ADDRESS } from '../../../apollo/user/mutation';
+import { CREATE_ADDRESS, DELETE_ADDRESS, SET_DEFAULT_ADDRESS, UPDATE_ADDRESS } from '../../../apollo/user/mutation';
 import type { Address } from '../../types/address/address';
 
 interface AddressFormState {
@@ -23,18 +24,26 @@ const EMPTY_FORM: AddressFormState = {
 	postalCode: '',
 };
 
+const REFETCH = [{ query: GET_MY_ADDRESSES }];
+
 const ProfileAddress = () => {
 	const [showForm, setShowForm] = useState(false);
+	const [editingId, setEditingId] = useState<string | null>(null);
 	const [form, setForm] = useState<AddressFormState>(EMPTY_FORM);
 
 	const { data, loading } = useQuery<{ getMyAddresses: Address[] }>(GET_MY_ADDRESSES);
-	const [createAddress, { loading: creating }] = useMutation(CREATE_ADDRESS, {
-		refetchQueries: [{ query: GET_MY_ADDRESSES }],
-	});
-	const [deleteAddress] = useMutation(DELETE_ADDRESS, { refetchQueries: [{ query: GET_MY_ADDRESSES }] });
-	const [setDefaultAddress] = useMutation(SET_DEFAULT_ADDRESS, { refetchQueries: [{ query: GET_MY_ADDRESSES }] });
+	const [createAddress, { loading: creating }] = useMutation(CREATE_ADDRESS, { refetchQueries: REFETCH });
+	const [updateAddress, { loading: updating }] = useMutation(UPDATE_ADDRESS, { refetchQueries: REFETCH });
+	const [deleteAddress] = useMutation(DELETE_ADDRESS, { refetchQueries: REFETCH });
+	const [setDefaultAddress] = useMutation(SET_DEFAULT_ADDRESS, { refetchQueries: REFETCH });
 
 	const addresses = data?.getMyAddresses ?? [];
+
+	const resetForm = () => {
+		setForm(EMPTY_FORM);
+		setEditingId(null);
+		setShowForm(false);
+	};
 
 	const handleDelete = (id: string) => {
 		deleteAddress({ variables: { id: Number(id) } });
@@ -44,12 +53,44 @@ const ProfileAddress = () => {
 		setDefaultAddress({ variables: { id: Number(id) } });
 	};
 
+	const handleEdit = (address: Address) => {
+		setEditingId(address.id);
+		setForm({
+			recipientName: address.recipientName,
+			phone: address.phone,
+			addressLine1: address.addressLine1,
+			addressLine2: address.addressLine2 ?? '',
+			city: address.city,
+			postalCode: address.postalCode,
+		});
+		setShowForm(true);
+	};
+
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
-		await createAddress({ variables: { input: { ...form, addressLine2: form.addressLine2 || undefined } } });
-		setForm(EMPTY_FORM);
-		setShowForm(false);
+		try {
+			const input = { ...form, addressLine2: form.addressLine2 || undefined };
+			if (editingId) {
+				await updateAddress({ variables: { input: { id: Number(editingId), ...input } } });
+			} else {
+				await createAddress({ variables: { input } });
+			}
+			resetForm();
+		} catch (err: unknown) {
+			const message = err instanceof Error ? err.message : 'Xatolik yuz berdi';
+			Swal.fire({ icon: 'error', title: 'Xatolik', text: message });
+		}
 	};
+
+	const handleToggleForm = () => {
+		if (showForm) {
+			resetForm();
+		} else {
+			setShowForm(true);
+		}
+	};
+
+	const saving = creating || updating;
 
 	return (
 		<div className="profile-address">
@@ -72,6 +113,9 @@ const ProfileAddress = () => {
 							<p className="address-phone">{address.phone}</p>
 
 							<div className="address-actions">
+								<button type="button" className="address-action-btn" onClick={() => handleEdit(address)}>
+									Tahrirlash
+								</button>
 								{!address.isDefault && (
 									<button type="button" className="address-action-btn" onClick={() => handleSetDefault(address.id)}>
 										Asosiy qilish
@@ -138,13 +182,13 @@ const ProfileAddress = () => {
 							required
 						/>
 					</div>
-					<button type="submit" className="form-save-btn" disabled={creating}>
-						{creating ? 'Saqlanmoqda...' : 'Saqlash'}
+					<button type="submit" className="form-save-btn" disabled={saving}>
+						{saving ? 'Saqlanmoqda...' : 'Saqlash'}
 					</button>
 				</form>
 			)}
 
-			<button type="button" className="add-address-btn" onClick={() => setShowForm((prev) => !prev)}>
+			<button type="button" className="add-address-btn" onClick={handleToggleForm}>
 				{showForm ? 'Bekor qilish' : "Yangi manzil qo'shish"}
 			</button>
 		</div>

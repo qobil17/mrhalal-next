@@ -2,6 +2,17 @@
 @import './pc/main.scss';
 @import './mobile/main.scss';
 
+// Safety net: the desktop navbar has no responsive fallback of its own
+// (mobile/desktop layout switch is handled entirely in JS). If detection
+// ever misfires for a beat (e.g. the brief window before the viewport-width
+// check runs on mount), this stops the wrong layout from creating a
+// horizontal scrollbar/overflow instead of just looking cramped.
+html,
+body {
+	max-width: 100%;
+	overflow-x: hidden;
+}
+
 .app-crash-fallback {
 	min-height: 100vh;
 	display: flex;

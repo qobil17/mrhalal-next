@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import type { NextPage } from 'next';
 import { useMutation, useQuery } from '@apollo/client';
+import Swal from 'sweetalert2';
 import { withLayoutAdmin } from '../../../libs/components/layout/LayoutAdmin';
 import { GET_ALL_PRODUCTS_BY_ADMIN } from '../../../apollo/admin/query';
 import { GET_ALL_CATEGORIES } from '../../../apollo/user/query';
@@ -13,6 +14,11 @@ import {
 import type { Product, ProductsResponse } from '../../../libs/types/product/product';
 import type { Category } from '../../../libs/types/category/category';
 
+interface ImageRow {
+	url: string;
+	isPrimary: boolean;
+}
+
 interface ProductFormState {
 	nameUz: string;
 	nameKo: string;
@@ -20,9 +26,11 @@ interface ProductFormState {
 	nameAr: string;
 	categoryId: string;
 	price: string;
+	comparePrice: string;
 	stockQuantity: string;
 	unit: string;
 	isActive: boolean;
+	isFeatured: boolean;
 }
 
 const EMPTY_FORM: ProductFormState = {
@@ -31,18 +39,32 @@ const EMPTY_FORM: ProductFormState = {
 	nameEn: '',
 	nameAr: '',
 	categoryId: '',
-	price: '0',
+	price: '',
+	comparePrice: '',
 	stockQuantity: '0',
 	unit: 'KG',
 	isActive: true,
+	isFeatured: false,
 };
 
+const EMPTY_IMAGES: ImageRow[] = [{ url: '', isPrimary: true }];
+
 const UNITS = ['G', 'KG', 'L', 'ML', 'PIECE'];
+
+const isFormDirty = (form: ProductFormState, images: ImageRow[]) =>
+	form.nameUz !== '' ||
+	form.nameKo !== '' ||
+	form.nameEn !== '' ||
+	form.nameAr !== '' ||
+	form.categoryId !== '' ||
+	form.price !== '' ||
+	images.some((img) => img.url !== '');
 
 const AdminProductsPage: NextPage = () => {
 	const [showForm, setShowForm] = useState(false);
 	const [editingId, setEditingId] = useState<string | null>(null);
 	const [form, setForm] = useState<ProductFormState>(EMPTY_FORM);
+	const [images, setImages] = useState<ImageRow[]>(EMPTY_IMAGES);
 
 	const { data, loading, refetch } = useQuery<{ getAllProductsByAdmin: ProductsResponse }>(
 		GET_ALL_PRODUCTS_BY_ADMIN,
@@ -56,56 +78,130 @@ const AdminProductsPage: NextPage = () => {
 
 	const products = data?.getAllProductsByAdmin?.list ?? [];
 	const categories = categoriesData?.getAllCategories ?? [];
+	const saving = creating || updating;
 
 	const resetForm = () => {
 		setForm(EMPTY_FORM);
+		setImages(EMPTY_IMAGES);
 		setShowForm(false);
 		setEditingId(null);
+	};
+
+	const handleCancel = async () => {
+		if (isFormDirty(form, images)) {
+			const result = await Swal.fire({
+				icon: 'question',
+				title: 'Bekor qilish',
+				text: "Rostdan bekor qilasizmi? Kiritilgan ma'lumotlar o'chadi",
+				showCancelButton: true,
+				confirmButtonText: 'Ha, bekor qilish',
+				cancelButtonText: "Yo'q",
+				confirmButtonColor: '#6b7280',
+				cancelButtonColor: '#ef4444',
+			});
+			if (!result.isConfirmed) return;
+		}
+		resetForm();
 	};
 
 	const startEdit = (product: Product) => {
 		setEditingId(product.id);
 		setShowForm(true);
 		setForm({
-			nameUz: product.nameUz,
-			nameKo: product.nameKo,
-			nameEn: product.nameEn,
-			nameAr: product.nameAr,
-			categoryId: String(product.categoryId),
-			price: String(product.price),
-			stockQuantity: String(product.stockQuantity),
-			unit: product.unit,
-			isActive: product.isActive,
+			nameUz: product.nameUz ?? '',
+			nameKo: product.nameKo ?? '',
+			nameEn: product.nameEn ?? '',
+			nameAr: product.nameAr ?? '',
+			categoryId: product.categoryId != null ? String(product.categoryId) : '',
+			price: product.price != null ? String(product.price) : '',
+			comparePrice: product.comparePrice != null ? String(product.comparePrice) : '',
+			stockQuantity: product.stockQuantity != null ? String(product.stockQuantity) : '0',
+			unit: product.unit ?? 'KG',
+			isActive: product.isActive ?? true,
+			isFeatured: product.isFeatured ?? false,
+		});
+		const existingImages: ImageRow[] =
+			product.images?.length > 0
+				? product.images.map((img) => ({ url: img.url ?? '', isPrimary: img.isPrimary ?? false }))
+				: EMPTY_IMAGES;
+		setImages(existingImages);
+	};
+
+	const handleImageUrlChange = (index: number, url: string) => {
+		setImages((prev) => prev.map((img, i) => (i === index ? { ...img, url } : img)));
+	};
+
+	const handleSetPrimary = (index: number) => {
+		setImages((prev) => prev.map((img, i) => ({ ...img, isPrimary: i === index })));
+	};
+
+	const handleAddImage = () => {
+		setImages((prev) => [...prev, { url: '', isPrimary: false }]);
+	};
+
+	const handleRemoveImage = (index: number) => {
+		setImages((prev) => {
+			const next = prev.filter((_, i) => i !== index);
+			if (prev[index].isPrimary && next.length > 0) {
+				next[0] = { ...next[0], isPrimary: true };
+			}
+			return next.length > 0 ? next : EMPTY_IMAGES;
 		});
 	};
 
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
 
-		const input = {
+		// UpdateProductInput qabul qiladigan maydonlar (images yo'q)
+		const baseFields = {
 			nameUz: form.nameUz,
 			nameKo: form.nameKo,
 			nameEn: form.nameEn,
 			nameAr: form.nameAr,
 			categoryId: Number(form.categoryId),
-			price: Number(form.price) || 0,
-			stockQuantity: Number(form.stockQuantity) || 0,
+			price: parseFloat(form.price) || 0,
+			stockQuantity: parseInt(form.stockQuantity) || 0,
 			unit: form.unit,
 			isActive: form.isActive,
+			isFeatured: form.isFeatured,
+			...(form.comparePrice ? { comparePrice: parseFloat(form.comparePrice) } : {}),
 		};
 
-		if (editingId) {
-			await updateProduct({ variables: { input: { id: Number(editingId), ...input } } });
-		} else {
-			await createProduct({ variables: { input } });
-		}
+		const validImages = images
+			.filter((img) => img.url.trim() !== '')
+			.map((img, i) => ({ url: img.url.trim(), isPrimary: img.isPrimary, sortOrder: i }));
 
-		resetForm();
-		await refetch();
+		try {
+			if (editingId) {
+				// images har doim yuboriladi: bo'sh [] = barcha rasmlarni o'chir
+				await updateProduct({
+					variables: { input: { id: Number(editingId), ...baseFields, images: validImages } },
+				});
+			} else {
+				const createInput: Record<string, unknown> = { ...baseFields };
+				if (validImages.length > 0) createInput.images = validImages;
+				await createProduct({ variables: { input: createInput } });
+			}
+			resetForm();
+			await refetch();
+		} catch (err: unknown) {
+			const message = err instanceof Error ? err.message : 'Xatolik yuz berdi';
+			Swal.fire({ icon: 'error', title: 'Xatolik', text: message });
+		}
 	};
 
 	const handleDelete = async (id: string) => {
-		if (!window.confirm("Mahsulotni o'chirishni tasdiqlaysizmi?")) return;
+		const result = await Swal.fire({
+			icon: 'warning',
+			title: "O'chirishni tasdiqlang",
+			text: "Mahsulotni o'chirishni tasdiqlaysizmi?",
+			showCancelButton: true,
+			confirmButtonText: "Ha, o'chir",
+			cancelButtonText: "Yo'q",
+			confirmButtonColor: '#ef4444',
+			cancelButtonColor: '#6b7280',
+		});
+		if (!result.isConfirmed) return;
 		await deleteProduct({ variables: { id: Number(id) } });
 		await refetch();
 	};
@@ -116,84 +212,227 @@ const AdminProductsPage: NextPage = () => {
 			<div className="admin-table-wrap">
 				<div className="admin-table-header">
 					<h2>Mahsulotlar ro&apos;yxati</h2>
-					<button type="button" className="add-btn" onClick={() => (showForm ? resetForm() : setShowForm(true))}>
-						{showForm ? 'Bekor qilish' : 'Yangi mahsulot'}
-					</button>
+					{!showForm && (
+						<button type="button" className="add-btn" onClick={() => setShowForm(true)}>
+							Yangi mahsulot
+						</button>
+					)}
 				</div>
 
 				{showForm && (
-					<form className="admin-inline-form" onSubmit={handleSubmit}>
-						<input
-							placeholder="Nomi (UZ)"
-							value={form.nameUz}
-							onChange={(e) => setForm({ ...form, nameUz: e.target.value })}
-							required
-						/>
-						<input
-							placeholder="Nomi (KO)"
-							value={form.nameKo}
-							onChange={(e) => setForm({ ...form, nameKo: e.target.value })}
-							required
-						/>
-						<input
-							placeholder="Nomi (EN)"
-							value={form.nameEn}
-							onChange={(e) => setForm({ ...form, nameEn: e.target.value })}
-							required
-						/>
-						<input
-							placeholder="Nomi (AR)"
-							value={form.nameAr}
-							onChange={(e) => setForm({ ...form, nameAr: e.target.value })}
-							required
-						/>
-						<select
-							value={form.categoryId}
-							onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-							className="admin-status-select"
-							required
-						>
-							<option value="">Kategoriya tanlang</option>
-							{categories.map((category) => (
-								<option key={category.id} value={category.id}>
-									{category.nameUz}
-								</option>
+					<form className="admin-product-form" onSubmit={handleSubmit}>
+
+						{/* ── Nomlar ── */}
+						<fieldset className="form-section">
+							<legend className="form-section-title">Nomlar</legend>
+							<div className="form-row">
+								<div className="form-group">
+									<label htmlFor="nameUz">Nomi (O&apos;zbekcha) *</label>
+									<input
+										id="nameUz"
+										placeholder="Masalan: Qo'y go'shti"
+										value={form.nameUz ?? ''}
+										onChange={(e) => setForm({ ...form, nameUz: e.target.value })}
+										required
+									/>
+								</div>
+								<div className="form-group">
+									<label htmlFor="nameKo">Nomi (Koreyscha) *</label>
+									<input
+										id="nameKo"
+										placeholder="예: 양고기"
+										value={form.nameKo ?? ''}
+										onChange={(e) => setForm({ ...form, nameKo: e.target.value })}
+										required
+									/>
+								</div>
+								<div className="form-group">
+									<label htmlFor="nameEn">Nomi (Inglizcha) *</label>
+									<input
+										id="nameEn"
+										placeholder="E.g.: Lamb meat"
+										value={form.nameEn ?? ''}
+										onChange={(e) => setForm({ ...form, nameEn: e.target.value })}
+										required
+									/>
+								</div>
+								<div className="form-group">
+									<label htmlFor="nameAr">Nomi (Arabcha) *</label>
+									<input
+										id="nameAr"
+										placeholder="مثال: لحم الضأن"
+										value={form.nameAr ?? ''}
+										onChange={(e) => setForm({ ...form, nameAr: e.target.value })}
+										required
+										dir="rtl"
+									/>
+								</div>
+							</div>
+						</fieldset>
+
+						{/* ── Narx va ombor ── */}
+						<fieldset className="form-section">
+							<legend className="form-section-title">Narx va ombor</legend>
+							<div className="form-row">
+								<div className="form-group">
+									<label htmlFor="categoryId">Kategoriya *</label>
+									<select
+										id="categoryId"
+										value={form.categoryId}
+										onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+										className="admin-status-select"
+										required
+									>
+										<option value="">Kategoriya tanlang</option>
+										{categories.map((category) => (
+											<option key={category.id} value={category.id}>
+												{category.nameUz}
+											</option>
+										))}
+									</select>
+								</div>
+								<div className="form-group">
+									<label htmlFor="price">Narx (KRW) *</label>
+									<input
+										id="price"
+										type="number"
+										placeholder="0"
+										min="0"
+										step="0.01"
+										value={form.price ?? ''}
+										onChange={(e) => setForm({ ...form, price: e.target.value })}
+										required
+									/>
+								</div>
+								<div className="form-group">
+									<label htmlFor="comparePrice">Asl narx / Chegirmadan oldin (KRW)</label>
+									<input
+										id="comparePrice"
+										type="number"
+										placeholder="Ixtiyoriy"
+										min="0"
+										step="0.01"
+										value={form.comparePrice ?? ''}
+										onChange={(e) => setForm({ ...form, comparePrice: e.target.value })}
+									/>
+								</div>
+								<div className="form-group">
+									<label htmlFor="stockQuantity">Ombordagi soni</label>
+									<input
+										id="stockQuantity"
+										type="number"
+										placeholder="0"
+										min="0"
+										value={form.stockQuantity ?? '0'}
+										onChange={(e) => setForm({ ...form, stockQuantity: e.target.value })}
+									/>
+								</div>
+								<div className="form-group">
+									<label htmlFor="unit">O&apos;lchov birligi</label>
+									<select
+										id="unit"
+										value={form.unit}
+										onChange={(e) => setForm({ ...form, unit: e.target.value })}
+										className="admin-status-select"
+									>
+										{UNITS.map((u) => (
+											<option key={u} value={u}>{u}</option>
+										))}
+									</select>
+								</div>
+							</div>
+							<div className="form-row form-row--checkboxes">
+								<label className="admin-checkbox-label">
+									<input
+										type="checkbox"
+										checked={form.isActive ?? false}
+										onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
+									/>
+									Faol (sotuvda ko&apos;rinsin)
+								</label>
+								<label className="admin-checkbox-label">
+									<input
+										type="checkbox"
+										checked={form.isFeatured ?? false}
+										onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })}
+									/>
+									Tavsiya etilgan (bosh sahifada ko&apos;rinsin)
+								</label>
+							</div>
+						</fieldset>
+
+						{/* ── Rasmlar ── */}
+						<fieldset className="form-section">
+							<legend className="form-section-title">Rasmlar</legend>
+							<p className="form-hint">
+								Rasm URL manzillarini kiriting. &quot;Asosiy&quot; belgilangan rasm mahsulot kartasida ko&apos;rinadi.
+							</p>
+							{images.map((img, index) => (
+								<div key={index} className="image-row">
+									<div className="image-preview-box">
+										{img.url ? (
+											// eslint-disable-next-line @next/next/no-img-element
+											<img
+												src={img.url}
+												alt={`Rasm ${index + 1}`}
+												className="image-preview-thumb"
+												onError={(e) => {
+													(e.currentTarget as HTMLImageElement).style.display = 'none';
+												}}
+											/>
+										) : (
+											<span className="image-preview-empty">Oldindan ko&apos;rish</span>
+										)}
+									</div>
+									<input
+										type="url"
+										placeholder="https://example.com/image.jpg"
+										value={img.url}
+										onChange={(e) => handleImageUrlChange(index, e.target.value)}
+										className="image-url-input"
+									/>
+									<label className="admin-checkbox-label image-primary-label">
+										<input
+											type="radio"
+											name="primaryImage"
+											checked={img.isPrimary}
+											onChange={() => handleSetPrimary(index)}
+										/>
+										Asosiy
+									</label>
+									{images.length > 1 && (
+										<button
+											type="button"
+											className="image-remove-btn"
+											onClick={() => handleRemoveImage(index)}
+											title="Rasmni o'chir"
+										>
+											✕
+										</button>
+									)}
+								</div>
 							))}
-						</select>
-						<input
-							type="number"
-							placeholder="Narx"
-							value={form.price}
-							onChange={(e) => setForm({ ...form, price: e.target.value })}
-						/>
-						<input
-							type="number"
-							placeholder="Ombor miqdori"
-							value={form.stockQuantity}
-							onChange={(e) => setForm({ ...form, stockQuantity: e.target.value })}
-						/>
-						<select
-							value={form.unit}
-							onChange={(e) => setForm({ ...form, unit: e.target.value })}
-							className="admin-status-select"
-						>
-							{UNITS.map((unit) => (
-								<option key={unit} value={unit}>
-									{unit}
-								</option>
-							))}
-						</select>
-						<label className="admin-checkbox-label">
-							<input
-								type="checkbox"
-								checked={form.isActive}
-								onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
-							/>
-							Faol
-						</label>
-						<button type="submit" className="add-btn" disabled={creating || updating}>
-							{editingId ? 'Saqlash' : "Qo'shish"}
-						</button>
+							{images.length < 10 && (
+								<button type="button" className="image-add-btn" onClick={handleAddImage}>
+									+ Rasm qo&apos;shish
+								</button>
+							)}
+						</fieldset>
+
+						{/* ── Tugmalar ── */}
+						<div className="form-actions">
+							<button
+								type="button"
+								className="form-cancel-btn"
+								onClick={handleCancel}
+								disabled={saving}
+							>
+								Bekor qilish
+							</button>
+							<button type="submit" className="form-submit-btn" disabled={saving}>
+								{saving ? 'Saqlanmoqda...' : editingId ? 'Saqlash' : "Qo'shish"}
+							</button>
+						</div>
 					</form>
 				)}
 
@@ -220,7 +459,7 @@ const AdminProductsPage: NextPage = () => {
 									<td>{product.unit}</td>
 									<td>{product.price.toLocaleString()} ₩</td>
 									<td>{product.stockQuantity}</td>
-									<td>{product.isActive ? 'Faol' : 'Tugagan'}</td>
+									<td>{product.isActive ? 'Faol' : 'Nofaol'}</td>
 									<td>
 										<button type="button" className="action-btn edit-btn" onClick={() => startEdit(product)}>
 											✏️
