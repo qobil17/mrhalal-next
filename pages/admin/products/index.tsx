@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import type { NextPage } from 'next';
 import { useMutation, useQuery } from '@apollo/client';
 import Swal from 'sweetalert2';
+import { getJwtToken } from '../../../libs/auth';
 import { withLayoutAdmin } from '../../../libs/components/layout/LayoutAdmin';
 import { GET_ALL_PRODUCTS_BY_ADMIN } from '../../../apollo/admin/query';
 import { GET_ALL_CATEGORIES } from '../../../apollo/user/query';
@@ -60,11 +61,14 @@ const isFormDirty = (form: ProductFormState, images: ImageRow[]) =>
 	form.price !== '' ||
 	images.some((img) => img.url !== '');
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
+
 const AdminProductsPage: NextPage = () => {
 	const [showForm, setShowForm] = useState(false);
 	const [editingId, setEditingId] = useState<string | null>(null);
 	const [form, setForm] = useState<ProductFormState>(EMPTY_FORM);
 	const [images, setImages] = useState<ImageRow[]>(EMPTY_IMAGES);
+	const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
 
 	const { data, loading, refetch } = useQuery<{ getAllProductsByAdmin: ProductsResponse }>(
 		GET_ALL_PRODUCTS_BY_ADMIN,
@@ -147,6 +151,37 @@ const AdminProductsPage: NextPage = () => {
 			}
 			return next.length > 0 ? next : EMPTY_IMAGES;
 		});
+	};
+
+	const handleFileSelect = async (index: number, file: File) => {
+		setUploadingIndex(index);
+		try {
+			const token = getJwtToken();
+			const formData = new FormData();
+			formData.append('file', file);
+
+			const res = await fetch(`${API_BASE}/upload/image`, {
+				method: 'POST',
+				headers: token ? { Authorization: `Bearer ${token}` } : {},
+				body: formData,
+			});
+
+			if (!res.ok) {
+				const data = await res.json().catch(() => ({})) as { message?: string };
+				throw new Error(data.message ?? `Server xatosi: ${res.status}`);
+			}
+
+			const { url } = (await res.json()) as { url: string; publicId: string };
+			handleImageUrlChange(index, url);
+		} catch (err: unknown) {
+			Swal.fire({
+				icon: 'error',
+				title: 'Yuklanmadi',
+				text: err instanceof Error ? err.message : 'Rasm yuklanmadi',
+			});
+		} finally {
+			setUploadingIndex(null);
+		}
 	};
 
 	const handleSubmit = async (e: FormEvent) => {
@@ -384,13 +419,38 @@ const AdminProductsPage: NextPage = () => {
 											<span className="image-preview-empty">Oldindan ko&apos;rish</span>
 										)}
 									</div>
-									<input
-										type="url"
-										placeholder="https://example.com/image.jpg"
-										value={img.url}
-										onChange={(e) => handleImageUrlChange(index, e.target.value)}
-										className="image-url-input"
-									/>
+
+									<div className="image-upload-group">
+										<input
+											type="file"
+											id={`file-input-${index}`}
+											accept="image/jpeg,image/png,image/webp"
+											style={{ display: 'none' }}
+											onChange={(e) => {
+												const file = e.target.files?.[0];
+												if (file) void handleFileSelect(index, file);
+												e.target.value = '';
+											}}
+										/>
+										<button
+											type="button"
+											className="image-upload-btn"
+											onClick={() =>
+												(document.getElementById(`file-input-${index}`) as HTMLInputElement | null)?.click()
+											}
+											disabled={uploadingIndex !== null}
+										>
+											{uploadingIndex === index ? 'Yuklanmoqda...' : 'Fayl tanlash'}
+										</button>
+										<input
+											type="url"
+											placeholder="yoki URL manzilini kiriting..."
+											value={img.url}
+											onChange={(e) => handleImageUrlChange(index, e.target.value)}
+											className="image-url-input"
+										/>
+									</div>
+
 									<label className="admin-checkbox-label image-primary-label">
 										<input
 											type="radio"
