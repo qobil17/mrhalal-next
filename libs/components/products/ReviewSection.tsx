@@ -5,6 +5,7 @@ import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
 import { GET_PRODUCT_REVIEWS, GET_PRODUCT_BY_SLUG } from '../../../apollo/user/query';
 import { CREATE_REVIEW } from '../../../apollo/user/mutation';
 import { userVar } from '../../../apollo/client';
+import { langVar, t } from '../../i18n';
 import type { Member } from '../../types/member/member';
 
 interface Review {
@@ -29,6 +30,7 @@ const STARS = [1, 2, 3, 4, 5];
 
 const ReviewSection = ({ productId, slug }: ReviewSectionProps) => {
 	const user = useReactiveVar(userVar) as Member | null;
+	const lang = useReactiveVar(langVar);
 	const [rating, setRating] = useState(5);
 	const [comment, setComment] = useState('');
 	const [message, setMessage] = useState('');
@@ -51,16 +53,16 @@ const ReviewSection = ({ productId, slug }: ReviewSectionProps) => {
 			await createReview({ variables: { input: { productId: Number(productId), rating, comment } } });
 			setComment('');
 			setRating(5);
-			setMessage("Sharhingiz uchun rahmat!");
+			setMessage(t('reviewThanks', lang));
 			await refetch();
 		} catch (err) {
-			setMessage(err instanceof Error ? err.message : 'Xatolik yuz berdi');
+			setMessage(err instanceof Error ? err.message : t('genericError', lang));
 		}
 	};
 
 	return (
 		<section className="review-section">
-			<h2>Sharhlar ({data?.getProductReviews?.total ?? 0})</h2>
+			<h2>{t('reviews', lang)} ({data?.getProductReviews?.total ?? 0})</h2>
 
 			{user ? (
 				<form className="review-form" onSubmit={handleSubmit}>
@@ -78,7 +80,7 @@ const ReviewSection = ({ productId, slug }: ReviewSectionProps) => {
 						))}
 					</div>
 					<textarea
-						placeholder="Mahsulot haqida fikringizni yozing..."
+						placeholder={t('reviewPlaceholder', lang)}
 						value={comment}
 						onChange={(e) => setComment(e.target.value)}
 						minLength={5}
@@ -87,17 +89,17 @@ const ReviewSection = ({ productId, slug }: ReviewSectionProps) => {
 					/>
 					{message && <p className="review-message">{message}</p>}
 					<button type="submit" className="review-submit-btn" disabled={submitting}>
-						{submitting ? 'Yuborilmoqda...' : 'Sharh qoldirish'}
+						{submitting ? t('placingOrder', lang) : t('submitReview', lang)}
 					</button>
 				</form>
 			) : (
 				<p className="empty-text">
-					Sharh qoldirish uchun <Link href="/auth">tizimga kiring</Link>
+					<Link href="/auth">{t('loginToReview', lang)}</Link>
 				</p>
 			)}
 
 			{loading ? (
-				<p className="loading-text">Yuklanmoqda...</p>
+				<p className="loading-text">{t('loading', lang)}</p>
 			) : reviews.length > 0 ? (
 				<div className="review-list">
 					{reviews.map((review) => (
@@ -112,7 +114,7 @@ const ReviewSection = ({ productId, slug }: ReviewSectionProps) => {
 					))}
 				</div>
 			) : (
-				<p className="empty-text">Hozircha sharhlar yo&apos;q</p>
+				<p className="empty-text">{t('noReviews', lang)}</p>
 			)}
 		</section>
 	);

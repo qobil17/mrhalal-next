@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation, useReactiveVar } from '@apollo/client';
 import Swal from 'sweetalert2';
 import { GET_MY_ADDRESSES } from '../../../apollo/user/query';
 import { CREATE_ADDRESS, DELETE_ADDRESS, SET_DEFAULT_ADDRESS, UPDATE_ADDRESS } from '../../../apollo/user/mutation';
+import { langVar, t } from '../../i18n';
 import type { Address } from '../../types/address/address';
 
 interface AddressFormState {
@@ -27,6 +28,7 @@ const EMPTY_FORM: AddressFormState = {
 const REFETCH = [{ query: GET_MY_ADDRESSES }];
 
 const ProfileAddress = () => {
+	const lang = useReactiveVar(langVar);
 	const [showForm, setShowForm] = useState(false);
 	const [editingId, setEditingId] = useState<string | null>(null);
 	const [form, setForm] = useState<AddressFormState>(EMPTY_FORM);
@@ -77,8 +79,8 @@ const ProfileAddress = () => {
 			}
 			resetForm();
 		} catch (err: unknown) {
-			const message = err instanceof Error ? err.message : 'Xatolik yuz berdi';
-			Swal.fire({ icon: 'error', title: 'Xatolik', text: message });
+			const message = err instanceof Error ? err.message : t('genericError', lang);
+			Swal.fire({ icon: 'error', title: t('errorTitle', lang), text: message });
 		}
 	};
 
@@ -94,17 +96,17 @@ const ProfileAddress = () => {
 
 	return (
 		<div className="profile-address">
-			<h2>Manzillar</h2>
+			<h2>{t('addresses', lang)}</h2>
 
 			{loading ? (
-				<p className="loading-text">Yuklanmoqda...</p>
+				<p className="loading-text">{t('loading', lang)}</p>
 			) : addresses.length > 0 ? (
 				<div className="address-list">
 					{addresses.map((address) => (
 						<div key={address.id} className={`address-card${address.isDefault ? ' default' : ''}`}>
 							<p className="address-title">
 								{address.recipientName}
-								{address.isDefault && <span className="default-badge">Asosiy</span>}
+								{address.isDefault && <span className="default-badge">{t('defaultBadge', lang)}</span>}
 							</p>
 							<p className="address-content">
 								{address.addressLine1}
@@ -114,28 +116,28 @@ const ProfileAddress = () => {
 
 							<div className="address-actions">
 								<button type="button" className="address-action-btn" onClick={() => handleEdit(address)}>
-									Tahrirlash
+									{t('editAddress', lang)}
 								</button>
 								{!address.isDefault && (
 									<button type="button" className="address-action-btn" onClick={() => handleSetDefault(address.id)}>
-										Asosiy qilish
+										{t('makeDefault', lang)}
 									</button>
 								)}
 								<button type="button" className="address-action-btn" onClick={() => handleDelete(address.id)}>
-									O&apos;chirish
+									{t('deleteAddress', lang)}
 								</button>
 							</div>
 						</div>
 					))}
 				</div>
 			) : (
-				<p className="empty-text">Manzillar mavjud emas</p>
+				<p className="empty-text">{t('noAddresses', lang)}</p>
 			)}
 
 			{showForm && (
 				<form className="profile-form" onSubmit={handleSubmit}>
 					<div className="form-group">
-						<label htmlFor="recipientName">Qabul qiluvchi</label>
+						<label htmlFor="recipientName">{t('recipientName', lang)}</label>
 						<input
 							id="recipientName"
 							value={form.recipientName}
@@ -144,7 +146,7 @@ const ProfileAddress = () => {
 						/>
 					</div>
 					<div className="form-group">
-						<label htmlFor="addrPhone">Telefon</label>
+						<label htmlFor="addrPhone">{t('phoneLabel', lang)}</label>
 						<input
 							id="addrPhone"
 							value={form.phone}
@@ -153,7 +155,7 @@ const ProfileAddress = () => {
 						/>
 					</div>
 					<div className="form-group">
-						<label htmlFor="addressLine1">Manzil</label>
+						<label htmlFor="addressLine1">{t('addressLabel', lang)}</label>
 						<input
 							id="addressLine1"
 							value={form.addressLine1}
@@ -162,7 +164,7 @@ const ProfileAddress = () => {
 						/>
 					</div>
 					<div className="form-group">
-						<label htmlFor="addressLine2">Manzil (qo&apos;shimcha)</label>
+						<label htmlFor="addressLine2">{t('addressLine2', lang)}</label>
 						<input
 							id="addressLine2"
 							value={form.addressLine2}
@@ -170,11 +172,11 @@ const ProfileAddress = () => {
 						/>
 					</div>
 					<div className="form-group">
-						<label htmlFor="city">Shahar</label>
+						<label htmlFor="city">{t('city', lang)}</label>
 						<input id="city" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} required />
 					</div>
 					<div className="form-group">
-						<label htmlFor="postalCode">Pochta indeksi</label>
+						<label htmlFor="postalCode">{t('postalCode', lang)}</label>
 						<input
 							id="postalCode"
 							value={form.postalCode}
@@ -183,13 +185,13 @@ const ProfileAddress = () => {
 						/>
 					</div>
 					<button type="submit" className="form-save-btn" disabled={saving}>
-						{saving ? 'Saqlanmoqda...' : 'Saqlash'}
+						{saving ? t('saving', lang) : t('saveButton', lang)}
 					</button>
 				</form>
 			)}
 
 			<button type="button" className="add-address-btn" onClick={handleToggleForm}>
-				{showForm ? 'Bekor qilish' : "Yangi manzil qo'shish"}
+				{showForm ? t('cancel', lang) : t('addNewAddress', lang)}
 			</button>
 		</div>
 	);

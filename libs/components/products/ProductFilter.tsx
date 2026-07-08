@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { useReactiveVar } from '@apollo/client';
 import { Category } from '../../types/category/category';
+import { getLocalizedName, langVar, t } from '../../i18n';
 
 export interface ProductFilters {
 	categoryId?: number;
@@ -21,6 +23,7 @@ export const initialProductFilters: ProductFilters = {
 };
 
 const ProductFilter = ({ categories, onFilter }: ProductFilterProps) => {
+	const lang = useReactiveVar(langVar);
 	const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
 	const [minPrice, setMinPrice] = useState('');
 	const [maxPrice, setMaxPrice] = useState('');
@@ -56,19 +59,19 @@ const ProductFilter = ({ categories, onFilter }: ProductFilterProps) => {
 
 	return (
 		<div className="product-filter">
-			<h4>Qidiruv</h4>
+			<h4>{t('searchLabel', lang)}</h4>
 			<input
 				type="text"
 				className="filter-search"
-				placeholder="Mahsulot qidirish..."
+				placeholder={t('searchPlaceholder', lang)}
 				value={search}
 				onChange={(e) => handleSearch(e.target.value)}
 			/>
 
-			<h4>Kategoriya</h4>
+			<h4>{t('categoryLabel', lang)}</h4>
 			<label className="filter-item">
 				<input type="radio" name="category" checked={categoryId === undefined} onChange={() => selectCategory(undefined)} />
-				Barchasi
+				{t('allCategories', lang)}
 			</label>
 			{categories.map((category) => (
 				<label key={category.id} className="filter-item">
@@ -78,11 +81,11 @@ const ProductFilter = ({ categories, onFilter }: ProductFilterProps) => {
 						checked={categoryId === Number(category.id)}
 						onChange={() => selectCategory(Number(category.id))}
 					/>
-					{category.nameUz}
+					{getLocalizedName(category, lang)}
 				</label>
 			))}
 
-			<h4>Narx</h4>
+			<h4>{t('priceLabel', lang)}</h4>
 			<div className="price-inputs">
 				<input
 					type="number"
@@ -102,7 +105,7 @@ const ProductFilter = ({ categories, onFilter }: ProductFilterProps) => {
 			</div>
 
 			<button type="button" className="filter-clear-btn" onClick={handleClear}>
-				Filterni tozalash
+				{t('clearFilters', lang)}
 			</button>
 		</div>
 	);

@@ -45,7 +45,7 @@ const HomePage: NextPage = () => {
 						</div>
 
 						{productsLoading ? (
-							<p className="loading-text">Yuklanmoqda...</p>
+							<p className="loading-text">{t('loading', lang)}</p>
 						) : (
 							<div className="products-grid products-grid--4col">
 								{newProducts.map((product) => (
@@ -65,7 +65,7 @@ const HomePage: NextPage = () => {
 						</div>
 
 						{featuredLoading ? (
-							<p className="loading-text">Yuklanmoqda...</p>
+							<p className="loading-text">{t('loading', lang)}</p>
 						) : (
 							<div className="products-grid products-grid--4col">
 								{featuredProducts.map((product) => (
@@ -85,7 +85,7 @@ const HomePage: NextPage = () => {
 						</div>
 
 						{productsLoading ? (
-							<p className="loading-text">Yuklanmoqda...</p>
+							<p className="loading-text">{t('loading', lang)}</p>
 						) : (
 							<div className="products-grid products-grid--4col">
 								{allProducts.map((product) => (

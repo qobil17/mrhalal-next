@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { NextPage } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useQuery, useReactiveVar } from '@apollo/client';
 import { withLayoutHome } from '../../libs/components/layout/LayoutHome';
@@ -11,6 +12,7 @@ import ProfileWishlist from '../../libs/components/member/ProfileWishlist';
 import { GET_MY_PROFILE } from '../../apollo/user/query';
 import { logOut } from '../../libs/auth';
 import { authReadyVar, userVar } from '../../apollo/client';
+import { langVar, t } from '../../libs/i18n';
 import type { Member } from '../../libs/types/member/member';
 
 type ProfileTab = 'info' | 'address' | 'orders' | 'wishlist';
@@ -22,6 +24,7 @@ const ProfilePage: NextPage = () => {
 	const [activeTab, setActiveTab] = useState<ProfileTab>('info');
 	const authReady = useReactiveVar(authReadyVar);
 	const user = useReactiveVar(userVar) as Member | null;
+	const lang = useReactiveVar(langVar);
 
 	useEffect(() => {
 		const tab = router.query.tab;
@@ -39,7 +42,7 @@ const ProfilePage: NextPage = () => {
 		return (
 			<div className="profile-page">
 				<div className="container">
-					<p className="loading-text">Yuklanmoqda...</p>
+					<p className="loading-text">{t('loading', lang)}</p>
 				</div>
 			</div>
 		);
@@ -51,8 +54,8 @@ const ProfilePage: NextPage = () => {
 				<div className="container">
 					<div className="cart-empty">
 						<span>🔒</span>
-						<p>Profilni ko&apos;rish uchun tizimga kiring</p>
-						<Link href="/auth">Tizimga kirish</Link>
+						<p>{t('loginRequired', lang)}</p>
+						<Link href="/auth">{t('goToLogin', lang)}</Link>
 					</div>
 				</div>
 			</div>
@@ -63,7 +66,7 @@ const ProfilePage: NextPage = () => {
 		return (
 			<div className="profile-page">
 				<div className="container">
-					<p className="loading-text">Yuklanmoqda...</p>
+					<p className="loading-text">{t('loading', lang)}</p>
 				</div>
 			</div>
 		);
@@ -77,7 +80,19 @@ const ProfilePage: NextPage = () => {
 				<div className="profile-layout">
 					<aside className="profile-sidebar">
 						<div className="sidebar-user">
-							<div className="sidebar-avatar">👤</div>
+							<div className="sidebar-avatar">
+								{user?.avatar ? (
+									<Image
+										src={user.avatar}
+										alt={profile.firstName}
+										width={48}
+										height={48}
+										style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+									/>
+								) : (
+									'👤'
+								)}
+							</div>
 							<div className="sidebar-user-info">
 								<strong>
 									{profile.firstName} {profile.lastName}
@@ -94,7 +109,7 @@ const ProfilePage: NextPage = () => {
 									onClick={() => setActiveTab('info')}
 								>
 									<span className="nav-icon">👤</span>
-									<span>Shaxsiy ma&apos;lumotlar</span>
+									<span>{t('personalInfo', lang)}</span>
 								</button>
 								<button
 									type="button"
@@ -102,7 +117,7 @@ const ProfilePage: NextPage = () => {
 									onClick={() => setActiveTab('address')}
 								>
 									<span className="nav-icon">📍</span>
-									<span>Manzillar</span>
+									<span>{t('addresses', lang)}</span>
 								</button>
 								<button
 									type="button"
@@ -110,7 +125,7 @@ const ProfilePage: NextPage = () => {
 									onClick={() => setActiveTab('orders')}
 								>
 									<span className="nav-icon">📦</span>
-									<span>Buyurtmalar</span>
+									<span>{t('orders', lang)}</span>
 								</button>
 								<button
 									type="button"
@@ -118,13 +133,13 @@ const ProfilePage: NextPage = () => {
 									onClick={() => setActiveTab('wishlist')}
 								>
 									<span className="nav-icon">❤️</span>
-									<span>Wishlist</span>
+									<span>{t('wishlist', lang)}</span>
 								</button>
 							</nav>
 							<div className="sidebar-divider" />
 							<button type="button" className="sidebar-logout" onClick={logOut}>
 								<span className="nav-icon">🚪</span>
-								<span>Chiqish</span>
+								<span>{t('logout', lang)}</span>
 							</button>
 						</div>
 					</aside>

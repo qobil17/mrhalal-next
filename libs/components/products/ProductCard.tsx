@@ -60,9 +60,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
 		try {
 			await addToCart({ variables: { input: { productId: Number(id), quantity: 1 } } });
-			await Swal.fire({ icon: 'success', title: "Mahsulot savatga qo'shildi", timer: 1200, showConfirmButton: false });
+			await Swal.fire({ icon: 'success', title: t('addedToCart', lang), timer: 1200, showConfirmButton: false });
 		} catch {
-			await Swal.fire({ icon: 'error', title: 'Xatolik yuz berdi, qayta urinib koʻring' });
+			await Swal.fire({ icon: 'error', title: t('genericError', lang) });
 		}
 	};
 
@@ -86,7 +86,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 				<p className="product-card-name">{name}</p>
 				<span className="product-card-unit">{unit}</span>
 				<p className="product-card-price">₩{price.toLocaleString()}</p>
-				<p className="product-card-stock">Omborda: {stockQuantity} ta</p>
+				<p className="product-card-stock">{t('stock', lang)}: {stockQuantity} ta</p>
 
 				<button
 					type="button"

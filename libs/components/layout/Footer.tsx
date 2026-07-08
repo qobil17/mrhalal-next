@@ -1,9 +1,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { useReactiveVar } from '@apollo/client';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
+import { langVar, t } from '../../i18n';
 
 const Footer = () => {
 	const device = useDeviceDetect();
+	const lang = useReactiveVar(langVar);
 
 	const logoWidth = device === 'mobile' ? 100 : 120;
 	const logoHeight = device === 'mobile' ? 50 : 60;
@@ -14,7 +17,7 @@ const Footer = () => {
 				<div className="footer-grid">
 					<div className="footer-brand">
 						<Image src="/mrhalal_logo_v3.svg" width={logoWidth} height={logoHeight} alt="Mr. Halal" />
-						<p className="footer-tagline">Koreyadagi halol go&apos;sht do&apos;koni</p>
+						<p className="footer-tagline">{t('tagline', lang)}</p>
 					</div>
 
 					<div className="footer-contact">
@@ -23,13 +26,13 @@ const Footer = () => {
 					</div>
 
 					<div className="footer-social">
-						<Link href="#">Instagram</Link>
-						<Link href="#">Telegram</Link>
+						<Link href="#">{t('instagram', lang)}</Link>
+						<Link href="#">{t('telegram', lang)}</Link>
 					</div>
 				</div>
 
 				<div className="footer-bottom">
-					<p>© 2024 Mr. Halal. All rights reserved.</p>
+					<p>{t('copyright', lang)}</p>
 				</div>
 			</div>
 		</footer>

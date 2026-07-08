@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useQuery } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
 import { withLayoutHome } from '../../libs/components/layout/LayoutHome';
 import CategoryScroll from '../../libs/components/homepage/CategoryScroll';
 import ProductCard from '../../libs/components/products/ProductCard';
 import ProductFilter, { initialProductFilters, ProductFilters } from '../../libs/components/products/ProductFilter';
 import { GET_ALL_PRODUCTS, GET_ALL_CATEGORIES } from '../../apollo/user/query';
+import { langVar, t } from '../../libs/i18n';
 import type { Product, ProductsResponse } from '../../libs/types/product/product';
 import type { Category } from '../../libs/types/category/category';
 
@@ -14,6 +15,7 @@ const PAGE_SIZE = 12;
 
 const ProductsPage: NextPage = () => {
 	const router = useRouter();
+	const lang = useReactiveVar(langVar);
 	const [filters, setFilters] = useState<ProductFilters>(initialProductFilters);
 	const [limit, setLimit] = useState(PAGE_SIZE);
 
@@ -66,12 +68,12 @@ const ProductsPage: NextPage = () => {
 
 					<main className="products-main">
 						<div className="products-header">
-							<h2>Mahsulotlar</h2>
-							<span>{total} ta mahsulot</span>
+							<h2>{t('products', lang)}</h2>
+							<span>{total} {t('productsFound', lang)}</span>
 						</div>
 
 						{loading ? (
-							<p className="loading-text">Yuklanmoqda...</p>
+							<p className="loading-text">{t('loading', lang)}</p>
 						) : (
 							<div className="products-grid">
 								{products.map((product) => (
@@ -83,7 +85,7 @@ const ProductsPage: NextPage = () => {
 						{!loading && limit < total && (
 							<div className="show-more-wrap">
 								<button type="button" className="show-more-btn" onClick={() => setLimit((prev) => prev + PAGE_SIZE)}>
-									Ko&apos;proq ko&apos;rish
+									{t('showMore', lang)}
 								</button>
 							</div>
 						)}

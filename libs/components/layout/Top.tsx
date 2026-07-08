@@ -37,7 +37,17 @@ const Top = () => {
 
 						{user ? (
 							<Link href="/profile" className="profile-nav-btn">
-								<span className="profile-nav-avatar">👤</span>
+								{user.avatar ? (
+									<Image
+										src={user.avatar}
+										alt={user.firstName}
+										width={28}
+										height={28}
+										style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }}
+									/>
+								) : (
+									<span className="profile-nav-avatar">👤</span>
+								)}
 								<span className="profile-nav-name">{user.firstName}</span>
 							</Link>
 						) : (
@@ -123,7 +133,17 @@ const Top = () => {
 					{user ? (
 						<div className="nav-user">
 							<Link href="/profile" className="profile-nav-btn">
-								<span className="profile-nav-avatar">👤</span>
+								{user.avatar ? (
+									<Image
+										src={user.avatar}
+										alt={user.firstName}
+										width={28}
+										height={28}
+										style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }}
+									/>
+								) : (
+									<span className="profile-nav-avatar">👤</span>
+								)}
 								<span className="profile-nav-name">{user.firstName}</span>
 							</Link>
 							<button className="nav-logout-btn" onClick={logOut}>

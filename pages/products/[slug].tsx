@@ -8,7 +8,7 @@ import ReviewSection from '../../libs/components/products/ReviewSection';
 import { GET_PRODUCT_BY_SLUG, GET_MY_CART, GET_MY_WISHLIST } from '../../apollo/user/query';
 import { ADD_TO_CART, ADD_TO_WISHLIST, REMOVE_FROM_WISHLIST } from '../../apollo/user/mutation';
 import { userVar } from '../../apollo/client';
-import { getLocalizedName, langVar } from '../../libs/i18n';
+import { getLocalizedName, langVar, t } from '../../libs/i18n';
 import type { Member } from '../../libs/types/member/member';
 import type { Product } from '../../libs/types/product/product';
 import type { WishlistItem } from '../../libs/types/wishlist/wishlist';
@@ -55,7 +55,7 @@ const ProductDetailPage: NextPage = () => {
 		return (
 			<div className="product-detail-page">
 				<div className="container">
-					<p className="loading-text">Yuklanmoqda...</p>
+					<p className="loading-text">{t('loading', lang)}</p>
 				</div>
 			</div>
 		);
@@ -67,7 +67,7 @@ const ProductDetailPage: NextPage = () => {
 		return (
 			<div className="product-detail-page">
 				<div className="container">
-					<p>Mahsulot topilmadi</p>
+					<p>{t('productNotFound', lang)}</p>
 				</div>
 			</div>
 		);
@@ -95,9 +95,9 @@ const ProductDetailPage: NextPage = () => {
 
 		try {
 			await addToCart({ variables: { input: { productId: Number(product.id), quantity } } });
-			setMessage("Mahsulot savatga qo'shildi");
+			setMessage(t('addedToCart', lang));
 		} catch {
-			setMessage('Xatolik yuz berdi, qayta urinib koʻring');
+			setMessage(t('genericError', lang));
 		}
 	};
 
@@ -140,16 +140,16 @@ const ProductDetailPage: NextPage = () => {
 								className={`wishlist-toggle-btn${isWishlisted ? ' active' : ''}`}
 								onClick={handleToggleWishlist}
 								disabled={addingToWishlist || removingFromWishlist}
-								aria-label="Wishlist"
+								aria-label={t('wishlist', lang)}
 							>
 								{isWishlisted ? '❤️' : '🤍'}
 							</button>
 						</div>
 						<span className="product-detail-unit">{unit}</span>
 						<div className="product-detail-price">₩{price.toLocaleString()}</div>
-						<div className="product-detail-stock">Omborda: {stockQuantity} ta</div>
+						<div className="product-detail-stock">{t('stock', lang)}: {stockQuantity} ta</div>
 						<div className="product-detail-rating">
-							⭐ {product.averageRating.toFixed(1)} ({product.reviewCount} sharh)
+							⭐ {product.averageRating.toFixed(1)} ({product.reviewCount} {t('reviews', lang)})
 						</div>
 
 						{descriptionUz && <p className="product-detail-desc">{descriptionUz}</p>}
@@ -172,10 +172,10 @@ const ProductDetailPage: NextPage = () => {
 							onClick={handleAddToCart}
 							disabled={addingToCart || stockQuantity === 0}
 						>
-							Savatga qo&apos;shish
+							{t('addToCart', lang)}
 						</button>
 
-						<div className="detail-delivery">🚚 Yetkazib berish: {DELIVERY_FEE.toLocaleString()} ₩</div>
+						<div className="detail-delivery">🚚 {t('deliveryFee', lang)}: {DELIVERY_FEE.toLocaleString()} ₩</div>
 					</div>
 				</div>
 

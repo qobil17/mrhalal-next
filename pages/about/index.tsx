@@ -1,14 +1,18 @@
 import type { NextPage } from 'next';
+import { useReactiveVar } from '@apollo/client';
 import { withLayoutHome } from '../../libs/components/layout/LayoutHome';
+import { langVar, t } from '../../libs/i18n';
 
 const AboutPage: NextPage = () => {
+	const lang = useReactiveVar(langVar);
+
 	return (
 		<>
 			{/* Hero */}
 			<div className="about-hero">
 				<div className="container">
-					<h1>Mr. Halal haqida</h1>
-					<p>Koreyadagi eng ishonchli halol go&apos;sht do&apos;koni</p>
+					<h1>{t('aboutHeroTitle', lang)}</h1>
+					<p>{t('aboutHeroSubtitle', lang)}</p>
 				</div>
 			</div>
 
@@ -17,28 +21,21 @@ const AboutPage: NextPage = () => {
 				<div className="container">
 					<div className="about-section">
 						<div className="about-text">
-							<h2>Bizning haqimizda</h2>
-							<p>
-								Mr. Halal — 2015-yildan buyon Koreya musulmonlariga toza va sertifikatlangan halol mahsulotlar
-								yetkazib kelmoqda. Biz beef, lamb va chicken mahsulotlarini to&apos;g&apos;ridan-to&apos;g&apos;ri
-								ishonchli ta&apos;minotchilardan olib, mijozlarimizga eng yuqori sifatda taqdim etamiz.
-							</p>
-							<p>
-								Bizning missiyamiz — Koreyada yashovchi musulmon hamjamiyatiga qulay va ishonchli halol oziq-ovqat
-								xizmatini ko&apos;rsatish.
-							</p>
+							<h2>{t('aboutUsTitle', lang)}</h2>
+							<p>{t('aboutUsParagraph1', lang)}</p>
+							<p>{t('aboutUsParagraph2', lang)}</p>
 							<div className="about-stats">
 								<div className="about-stat">
 									<strong>2015</strong>
-									<span>Tashkil etilgan yil</span>
+									<span>{t('statYearLabel', lang)}</span>
 								</div>
 								<div className="about-stat">
 									<strong>500+</strong>
-									<span>Doimiy mijozlar</span>
+									<span>{t('statCustomersLabel', lang)}</span>
 								</div>
 								<div className="about-stat">
 									<strong>50+</strong>
-									<span>Mahsulot turlari</span>
+									<span>{t('statProductsLabel', lang)}</span>
 								</div>
 							</div>
 						</div>
@@ -53,23 +50,23 @@ const AboutPage: NextPage = () => {
 			<div className="frame-wrap frame-wrap--white">
 				<div className="container">
 					<div className="halal-section">
-						<h2>Halol sertifikat</h2>
-						<p>Barcha mahsulotlarimiz Korea Muslim Federation (KMF) tomonidan sertifikatlangan</p>
+						<h2>{t('halalCertTitle', lang)}</h2>
+						<p>{t('halalCertIntro', lang)}</p>
 						<div className="halal-cards">
 							<div className="halal-card">
 								<span>✅</span>
-								<h3>KMF Sertifikati</h3>
-								<p>Korea Muslim Federation tomonidan tasdiqlangan</p>
+								<h3>{t('halalCard1Title', lang)}</h3>
+								<p>{t('halalCard1Text', lang)}</p>
 							</div>
 							<div className="halal-card">
 								<span>🔍</span>
-								<h3>Sifat nazorati</h3>
-								<p>Har bir mahsulot qat&apos;iy nazorat ostida tekshiriladi</p>
+								<h3>{t('halalCard2Title', lang)}</h3>
+								<p>{t('halalCard2Text', lang)}</p>
 							</div>
 							<div className="halal-card">
 								<span>🚚</span>
-								<h3>Toza yetkazish</h3>
-								<p>Maxsus sovutgichli transport bilan yetkazib beriladi</p>
+								<h3>{t('halalCard3Title', lang)}</h3>
+								<p>{t('halalCard3Text', lang)}</p>
 							</div>
 						</div>
 					</div>
@@ -80,36 +77,36 @@ const AboutPage: NextPage = () => {
 			<div className="frame-wrap">
 				<div className="container">
 					<div className="location-section">
-						<h2>Do&apos;kon manzili</h2>
+						<h2>{t('storeLocationTitle', lang)}</h2>
 						<div className="location-layout">
 							<div className="location-info">
 								<div className="location-item">
 									<span>📍</span>
 									<div>
-										<strong>Manzil</strong>
+										<strong>{t('addressLabel', lang)}</strong>
 										<p>서울특별시 마포구 (Seoul, Mapo-gu)</p>
 									</div>
 								</div>
 								<div className="location-item">
 									<span>📞</span>
 									<div>
-										<strong>Telefon</strong>
+										<strong>{t('phoneLabel', lang)}</strong>
 										<p>877-3009</p>
 									</div>
 								</div>
 								<div className="location-item">
 									<span>🕐</span>
 									<div>
-										<strong>Ish vaqti</strong>
-										<p>Dushanba - Shanba: 09:00 - 20:00</p>
-										<p>Yakshanba: 10:00 - 18:00</p>
+										<strong>{t('hoursLabel', lang)}</strong>
+										<p>{t('hoursWeekday', lang)}</p>
+										<p>{t('hoursSunday', lang)}</p>
 									</div>
 								</div>
 								<div className="location-item">
 									<span>🚇</span>
 									<div>
-										<strong>Metro</strong>
-										<p>Hapjeong station (Line 2, 6) — 5 daqiqa</p>
+										<strong>{t('metroLabel', lang)}</strong>
+										<p>{t('metroText', lang)}</p>
 									</div>
 								</div>
 							</div>

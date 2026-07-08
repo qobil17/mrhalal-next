@@ -1,12 +1,13 @@
 import { useCallback, useState } from 'react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { ApolloError, useMutation } from '@apollo/client';
+import { ApolloError, useMutation, useReactiveVar } from '@apollo/client';
 import Swal from 'sweetalert2';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
 import { LOGIN, REGISTER } from '../../apollo/user/mutation';
 import { setJwtToken } from '../../libs/auth';
 import { userVar } from '../../apollo/client';
+import { langVar, t, type Lang } from '../../libs/i18n';
 import type { LoginInput, RegisterInput } from '../../libs/types/member/member.input';
 import type { AuthPayload } from '../../libs/types/member/member';
 
@@ -29,19 +30,20 @@ const initialRegisterInput: RegisterFormInput = {
 	confirmPassword: '',
 };
 
-const getErrorMessage = (err: unknown): string => {
+const getErrorMessage = (err: unknown, lang: Lang): string => {
 	if (err instanceof ApolloError) {
 		const graphQLError = err.graphQLErrors?.[0];
 		const originalError = graphQLError?.extensions?.originalError as { message?: string | string[] } | undefined;
 		const message = originalError?.message ?? graphQLError?.message ?? err.message;
-		return Array.isArray(message) ? message.join(', ') : message || 'Xatolik yuz berdi';
+		return Array.isArray(message) ? message.join(', ') : message || t('genericError', lang);
 	}
-	return err instanceof Error ? err.message : 'Xatolik yuz berdi';
+	return err instanceof Error ? err.message : t('genericError', lang);
 };
 
 const AuthPage: NextPage = () => {
 	const device = useDeviceDetect();
 	const router = useRouter();
+	const lang = useReactiveVar(langVar);
 	const [activeTab, setActiveTab] = useState<AuthTab>('login');
 	const [loginInput, setLoginInput] = useState<LoginInput>(initialLoginInput);
 	const [registerInput, setRegisterInput] = useState<RegisterFormInput>(initialRegisterInput);
@@ -78,13 +80,13 @@ const AuthPage: NextPage = () => {
 			setJwtToken(accessToken);
 			userVar(member);
 
-			await Swal.fire({ icon: 'success', title: 'Muvaffaqiyatli kirdingiz!', timer: 1500, showConfirmButton: false });
+			await Swal.fire({ icon: 'success', title: t('loginSuccess', lang), timer: 1500, showConfirmButton: false });
 			router.push('/');
 		} catch (err) {
-			const message = getErrorMessage(err);
-			await Swal.fire({ icon: 'error', title: 'Xatolik', text: message });
+			const message = getErrorMessage(err, lang);
+			await Swal.fire({ icon: 'error', title: t('errorTitle', lang), text: message });
 		}
-	}, [loginInput, login, router]);
+	}, [loginInput, login, router, lang]);
 
 	const handleRegister = useCallback(async () => {
 		try {
@@ -107,16 +109,16 @@ const AuthPage: NextPage = () => {
 
 			await Swal.fire({
 				icon: 'success',
-				title: "Muvaffaqiyatli ro'yxatdan o'tdingiz!",
+				title: t('registerSuccess', lang),
 				timer: 1500,
 				showConfirmButton: false,
 			});
 			router.push('/');
 		} catch (err) {
-			const message = getErrorMessage(err);
-			await Swal.fire({ icon: 'error', title: 'Xatolik', text: message });
+			const message = getErrorMessage(err, lang);
+			await Swal.fire({ icon: 'error', title: t('errorTitle', lang), text: message });
 		}
-	}, [registerInput, register, router]);
+	}, [registerInput, register, router, lang]);
 
 	const handleLoginSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -148,14 +150,14 @@ const AuthPage: NextPage = () => {
 						className={`auth-tab ${activeTab === 'login' ? 'active' : ''}`}
 						onClick={() => setActiveTab('login')}
 					>
-						Kirish
+						{t('loginTab', lang)}
 					</button>
 					<button
 						type="button"
 						className={`auth-tab ${activeTab === 'register' ? 'active' : ''}`}
 						onClick={() => setActiveTab('register')}
 					>
-						Ro&apos;yxatdan o&apos;tish
+						{t('registerTab', lang)}
 					</button>
 				</div>
 
@@ -164,16 +166,16 @@ const AuthPage: NextPage = () => {
 						<input
 							type="tel"
 							className="auth-input"
-							placeholder="01012345678"
+							placeholder={t('phonePlaceholder', lang)}
 							value={loginInput.phone}
 							onChange={(e) => handleLoginInput('phone', e.target.value)}
 						/>
-						<small className="input-hint">Format: 01012345678 (Korean number)</small>
+						<small className="input-hint">{t('phoneFormat', lang)}</small>
 						<div className="password-wrapper">
 							<input
 								type={showPassword ? 'text' : 'password'}
 								className="auth-input"
-								placeholder="Parol"
+								placeholder={t('passwordPlaceholder', lang)}
 								value={loginInput.password}
 								onChange={(e) => handleLoginInput('password', e.target.value)}
 							/>
@@ -182,7 +184,7 @@ const AuthPage: NextPage = () => {
 							</button>
 						</div>
 						<button type="submit" className="auth-submit" disabled={isLoginDisabled}>
-							{loginLoading ? 'Yuklanmoqda...' : 'Kirish'}
+							{loginLoading ? t('loading', lang) : t('loginButton', lang)}
 						</button>
 					</form>
 				) : (
@@ -190,30 +192,30 @@ const AuthPage: NextPage = () => {
 						<input
 							type="text"
 							className="auth-input"
-							placeholder="Ism"
+							placeholder={t('firstName', lang)}
 							value={registerInput.firstName}
 							onChange={(e) => handleRegisterInput('firstName', e.target.value)}
 						/>
 						<input
 							type="text"
 							className="auth-input"
-							placeholder="Familiya"
+							placeholder={t('lastName', lang)}
 							value={registerInput.lastName}
 							onChange={(e) => handleRegisterInput('lastName', e.target.value)}
 						/>
 						<input
 							type="tel"
 							className="auth-input"
-							placeholder="01012345678"
+							placeholder={t('phonePlaceholder', lang)}
 							value={registerInput.phone}
 							onChange={(e) => handleRegisterInput('phone', e.target.value)}
 						/>
-						<small className="input-hint">Format: 01012345678 (Korean number)</small>
+						<small className="input-hint">{t('phoneFormat', lang)}</small>
 						<div className="password-wrapper">
 							<input
 								type={showPassword ? 'text' : 'password'}
 								className="auth-input"
-								placeholder="Parol"
+								placeholder={t('passwordPlaceholder', lang)}
 								value={registerInput.password}
 								onChange={(e) => handleRegisterInput('password', e.target.value)}
 							/>
@@ -225,7 +227,7 @@ const AuthPage: NextPage = () => {
 							<input
 								type={showConfirmPassword ? 'text' : 'password'}
 								className="auth-input"
-								placeholder="Parolni tasdiqlang"
+								placeholder={t('confirmPasswordPlaceholder', lang)}
 								value={registerInput.confirmPassword}
 								onChange={(e) => handleRegisterInput('confirmPassword', e.target.value)}
 							/>
@@ -238,7 +240,7 @@ const AuthPage: NextPage = () => {
 							</button>
 						</div>
 						<button type="submit" className="auth-submit" disabled={isRegisterDisabled}>
-							{registerLoading ? 'Yuklanmoqda...' : "Ro'yxatdan o'tish"}
+							{registerLoading ? t('loading', lang) : t('registerButton', lang)}
 						</button>
 					</form>
 				)}
@@ -246,11 +248,11 @@ const AuthPage: NextPage = () => {
 				<div className="auth-switch">
 					{activeTab === 'login' ? (
 						<button type="button" onClick={() => setActiveTab('register')}>
-							Akkauntingiz yo&apos;qmi? Ro&apos;yxatdan o&apos;ting →
+							{t('noAccount', lang)}
 						</button>
 					) : (
 						<button type="button" onClick={() => setActiveTab('login')}>
-							Akkauntingiz bormi? Kiring →
+							{t('haveAccount', lang)}
 						</button>
 					)}
 				</div>

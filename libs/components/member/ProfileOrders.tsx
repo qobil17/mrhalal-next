@@ -1,5 +1,6 @@
-import { useQuery } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
 import { GET_MY_ORDERS } from '../../../apollo/user/query';
+import { langVar, t } from '../../i18n';
 import type { Order, OrdersResponse } from '../../types/order/order';
 
 const STATUS_COLORS: Record<string, string> = {
@@ -12,6 +13,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 const ProfileOrders = () => {
+	const lang = useReactiveVar(langVar);
 	const { data, loading } = useQuery<{ getMyOrders: OrdersResponse }>(GET_MY_ORDERS, {
 		variables: { input: { page: 1, limit: 10 } },
 	});
@@ -20,10 +22,10 @@ const ProfileOrders = () => {
 
 	return (
 		<div className="profile-orders">
-			<h2>Buyurtmalar</h2>
+			<h2>{t('orders', lang)}</h2>
 
 			{loading ? (
-				<p className="loading-text">Yuklanmoqda...</p>
+				<p className="loading-text">{t('loading', lang)}</p>
 			) : orders.length > 0 ? (
 				<div className="orders-list">
 					{orders.map((order) => (
@@ -42,7 +44,7 @@ const ProfileOrders = () => {
 					))}
 				</div>
 			) : (
-				<p className="empty-text">Buyurtmalar mavjud emas</p>
+				<p className="empty-text">{t('noOrders', lang)}</p>
 			)}
 		</div>
 	);
