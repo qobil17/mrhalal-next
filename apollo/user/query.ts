@@ -76,6 +76,33 @@ export const GET_FEATURED_PRODUCTS = gql`
 	}
 `;
 
+export const GET_DISCOUNTED_PRODUCTS = gql`
+	query GetDiscountedProducts {
+		getDiscountedProducts {
+			id
+			nameUz
+			nameKo
+			nameEn
+			price
+			comparePrice
+			unit
+			stockQuantity
+			slug
+			isActive
+			isFeatured
+			soldCount
+			averageRating
+			reviewCount
+			images {
+				id
+				url
+				isPrimary
+			}
+			categoryId
+		}
+	}
+`;
+
 export const GET_PRODUCT_BY_SLUG = gql`
 	query GetProductBySlug($slug: String!) {
 		getProductBySlug(slug: $slug) {

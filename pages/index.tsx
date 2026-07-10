@@ -5,7 +5,7 @@ import { withLayoutHome } from '../libs/components/layout/LayoutHome';
 import BannerSlider from '../libs/components/homepage/BannerSlider';
 import CategoryScroll from '../libs/components/homepage/CategoryScroll';
 import ProductCard from '../libs/components/products/ProductCard';
-import { GET_ALL_PRODUCTS, GET_FEATURED_PRODUCTS } from '../apollo/user/query';
+import { GET_ALL_PRODUCTS, GET_FEATURED_PRODUCTS, GET_DISCOUNTED_PRODUCTS } from '../apollo/user/query';
 import { langVar, t } from '../libs/i18n';
 import type { Product, ProductsResponse } from '../libs/types/product/product';
 
@@ -21,10 +21,12 @@ const HomePage: NextPage = () => {
 	});
 
 	const { data: featuredData, loading: featuredLoading } = useQuery<{ getFeaturedProducts: Product[] }>(GET_FEATURED_PRODUCTS);
+	const { data: discountedData, loading: discountedLoading } = useQuery<{ getDiscountedProducts: Product[] }>(GET_DISCOUNTED_PRODUCTS);
 
 	const allProducts = productsData?.getAllProducts?.list ?? [];
 	const totalProducts = productsData?.getAllProducts?.total ?? 0;
 	const featuredProducts = featuredData?.getFeaturedProducts ?? [];
+	const discountedProducts = discountedData?.getDiscountedProducts ?? [];
 	const newProducts = allProducts.slice(0, 8);
 
 	return (
@@ -37,7 +39,51 @@ const HomePage: NextPage = () => {
 				</div>
 			</div>
 
-			<div className="frame-wrap">
+			{(discountedLoading || discountedProducts.length > 0) && (
+				<div className="frame-wrap frame-wrap--white">
+					<div className="container">
+						<section className="home-section">
+							<div className="section-header">
+								<h2>{t('discountProducts', lang)}</h2>
+							</div>
+
+							{discountedLoading ? (
+								<p className="loading-text">{t('loading', lang)}</p>
+							) : (
+								<div className="products-grid products-grid--4col">
+									{discountedProducts.map((product) => (
+										<ProductCard key={product.id} product={product} />
+									))}
+								</div>
+							)}
+						</section>
+					</div>
+				</div>
+			)}
+
+			{(featuredLoading || featuredProducts.length > 0) && (
+				<div className="frame-wrap">
+					<div className="container">
+						<section className="home-section">
+							<div className="section-header">
+								<h2>{t('featured', lang)}</h2>
+							</div>
+
+							{featuredLoading ? (
+								<p className="loading-text">{t('loading', lang)}</p>
+							) : (
+								<div className="products-grid products-grid--4col">
+									{featuredProducts.map((product) => (
+										<ProductCard key={product.id} product={product} />
+									))}
+								</div>
+							)}
+						</section>
+					</div>
+				</div>
+			)}
+
+			<div className="frame-wrap frame-wrap--white">
 				<div className="container">
 					<section className="home-section">
 						<div className="section-header">
@@ -49,26 +95,6 @@ const HomePage: NextPage = () => {
 						) : (
 							<div className="products-grid products-grid--4col">
 								{newProducts.map((product) => (
-									<ProductCard key={product.id} product={product} />
-								))}
-							</div>
-						)}
-					</section>
-				</div>
-			</div>
-
-			<div className="frame-wrap frame-wrap--white">
-				<div className="container">
-					<section className="home-section">
-						<div className="section-header">
-							<h2>{t('featured', lang)}</h2>
-						</div>
-
-						{featuredLoading ? (
-							<p className="loading-text">{t('loading', lang)}</p>
-						) : (
-							<div className="products-grid products-grid--4col">
-								{featuredProducts.map((product) => (
 									<ProductCard key={product.id} product={product} />
 								))}
 							</div>
