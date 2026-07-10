@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import type { NextPage } from 'next';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
 import Swal from 'sweetalert2';
 import { getJwtToken } from '../../../libs/auth';
 import { withLayoutAdmin } from '../../../libs/components/layout/LayoutAdmin';
+import { langVar, t } from '../../../libs/i18n';
 import { GET_ALL_PRODUCTS_BY_ADMIN } from '../../../apollo/admin/query';
 import { GET_ALL_CATEGORIES } from '../../../apollo/user/query';
 import {
@@ -52,6 +53,8 @@ const EMPTY_IMAGES: ImageRow[] = [{ url: '', isPrimary: true }];
 
 const UNITS = ['G', 'KG', 'L', 'ML', 'PIECE'];
 
+const LABEL_OPTIONS = ['', 'RECOMMENDED', 'DISCOUNT'] as const;
+
 const isFormDirty = (form: ProductFormState, images: ImageRow[]) =>
 	form.nameUz !== '' ||
 	form.nameKo !== '' ||
@@ -69,6 +72,7 @@ const AdminProductsPage: NextPage = () => {
 	const [form, setForm] = useState<ProductFormState>(EMPTY_FORM);
 	const [images, setImages] = useState<ImageRow[]>(EMPTY_IMAGES);
 	const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+	const lang = useReactiveVar(langVar);
 
 	const { data, loading, refetch } = useQuery<{ getAllProductsByAdmin: ProductsResponse }>(
 		GET_ALL_PRODUCTS_BY_ADMIN,
@@ -219,6 +223,24 @@ const AdminProductsPage: NextPage = () => {
 			}
 			resetForm();
 			await refetch();
+		} catch (err: unknown) {
+			const message = err instanceof Error ? err.message : 'Xatolik yuz berdi';
+			Swal.fire({ icon: 'error', title: 'Xatolik', text: message });
+		}
+	};
+
+	const handleLabelChange = async (id: string, label: string) => {
+		try {
+			await updateProduct({
+				variables: { input: { id: Number(id), label: label === '' ? null : label } },
+			});
+			await refetch();
+			await Swal.fire({
+				icon: 'success',
+				title: t('adminLabelUpdateSuccess', lang),
+				timer: 1200,
+				showConfirmButton: false,
+			});
 		} catch (err: unknown) {
 			const message = err instanceof Error ? err.message : 'Xatolik yuz berdi';
 			Swal.fire({ icon: 'error', title: 'Xatolik', text: message });
@@ -508,6 +530,7 @@ const AdminProductsPage: NextPage = () => {
 								<th>Narx</th>
 								<th>Ombor</th>
 								<th>Holat</th>
+								<th>{t('adminLabelColumn', lang)}</th>
 								<th>Amallar</th>
 							</tr>
 						</thead>
@@ -520,6 +543,23 @@ const AdminProductsPage: NextPage = () => {
 									<td>{product.price.toLocaleString()} ₩</td>
 									<td>{product.stockQuantity}</td>
 									<td>{product.isActive ? 'Faol' : 'Nofaol'}</td>
+									<td>
+										<select
+											value={product.label ?? ''}
+											onChange={(e) => handleLabelChange(product.id, e.target.value)}
+											className="admin-status-select"
+										>
+											{LABEL_OPTIONS.map((option) => (
+												<option key={option} value={option}>
+													{option === 'RECOMMENDED'
+														? t('adminLabelRecommended', lang)
+														: option === 'DISCOUNT'
+															? t('adminLabelDiscount', lang)
+															: t('adminLabelNone', lang)}
+												</option>
+											))}
+										</select>
+									</td>
 									<td>
 										<button type="button" className="action-btn edit-btn" onClick={() => startEdit(product)}>
 											✏️

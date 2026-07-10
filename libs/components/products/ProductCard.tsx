@@ -16,6 +16,7 @@ export interface ProductCardData {
 	nameKo: string;
 	nameEn?: string | null;
 	price: number;
+	comparePrice?: number | null;
 	unit: string;
 	stockQuantity: number;
 	slug: string;
@@ -40,7 +41,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
 	const router = useRouter();
 	const user = useReactiveVar(userVar) as Member | null;
 	const lang = useReactiveVar(langVar);
-	const { id, price, unit, stockQuantity, images, slug } = product;
+	const { id, price, comparePrice, unit, stockQuantity, images, slug } = product;
+	const hasDiscount = !!comparePrice && comparePrice > price;
 	const name = getLocalizedName(product, lang);
 
 	const [addToCart, { loading: addingToCart }] = useMutation(ADD_TO_CART, {
@@ -85,7 +87,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
 			<div className="product-card-body">
 				<p className="product-card-name">{name}</p>
 				<span className="product-card-unit">{unit}</span>
-				<p className="product-card-price">₩{price.toLocaleString()}</p>
+				{hasDiscount ? (
+					<p className="product-card-price-row">
+						<span className="product-card-compare-price">₩{comparePrice!.toLocaleString()}</span>
+						<span className="product-card-price">₩{price.toLocaleString()}</span>
+					</p>
+				) : (
+					<p className="product-card-price">₩{price.toLocaleString()}</p>
+				)}
 				<p className="product-card-stock">{t('stock', lang)}: {stockQuantity} ta</p>
 
 				<button

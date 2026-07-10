@@ -19,6 +19,7 @@ export interface Product {
 	categoryId: number;
 	isActive: boolean;
 	isFeatured: boolean;
+	label?: 'RECOMMENDED' | 'DISCOUNT' | null;
 	soldCount: number;
 	viewCount: number;
 	averageRating: number;

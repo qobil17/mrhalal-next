@@ -187,6 +187,12 @@ const STRINGS = {
 
 		loading: 'Yuklanmoqda...',
 		genericError: "Xatolik yuz berdi, qayta urinib ko'ring",
+
+		adminLabelColumn: 'Yorliq',
+		adminLabelNone: 'Oddiy',
+		adminLabelRecommended: 'Tavsiya etilgan',
+		adminLabelDiscount: 'Chegirma',
+		adminLabelUpdateSuccess: 'Yorliq saqlandi',
 	},
 	KO: {
 		home: '홈',
@@ -334,6 +340,12 @@ const STRINGS = {
 
 		loading: '로딩 중...',
 		genericError: '오류가 발생했습니다. 다시 시도해 주세요',
+
+		adminLabelColumn: '라벨',
+		adminLabelNone: '일반',
+		adminLabelRecommended: '추천',
+		adminLabelDiscount: '할인',
+		adminLabelUpdateSuccess: '라벨이 저장되었습니다',
 	},
 	EN: {
 		home: 'Home',
@@ -482,6 +494,12 @@ const STRINGS = {
 
 		loading: 'Loading...',
 		genericError: 'Something went wrong, please try again',
+
+		adminLabelColumn: 'Label',
+		adminLabelNone: 'Regular',
+		adminLabelRecommended: 'Recommended',
+		adminLabelDiscount: 'Discount',
+		adminLabelUpdateSuccess: 'Label saved',
 	},
 } satisfies Record<Lang, Record<string, string>>;
 

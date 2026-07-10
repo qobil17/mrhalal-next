@@ -13,6 +13,7 @@ export const UPDATE_PRODUCT_BY_ADMIN = gql`
 	mutation UpdateProductByAdmin($input: UpdateProductInput!) {
 		updateProductByAdmin(input: $input) {
 			id
+			label
 			images {
 				id
 				url

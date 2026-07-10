@@ -14,6 +14,7 @@ export const GET_ALL_PRODUCTS_BY_ADMIN = gql`
 				stockQuantity
 				isActive
 				isFeatured
+				label
 				images {
 					id
 					url
