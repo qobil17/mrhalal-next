@@ -52,6 +52,29 @@ export const DELETE_CATEGORY_BY_ADMIN = gql`
 	}
 `;
 
+/** BANNER **/
+export const CREATE_BANNER_BY_ADMIN = gql`
+	mutation CreateBannerByAdmin($input: CreateBannerInput!) {
+		createBannerByAdmin(input: $input) {
+			id
+		}
+	}
+`;
+
+export const UPDATE_BANNER_BY_ADMIN = gql`
+	mutation UpdateBannerByAdmin($input: UpdateBannerInput!) {
+		updateBannerByAdmin(input: $input) {
+			id
+		}
+	}
+`;
+
+export const DELETE_BANNER_BY_ADMIN = gql`
+	mutation DeleteBannerByAdmin($id: Int!) {
+		deleteBannerByAdmin(id: $id)
+	}
+`;
+
 /** ORDER **/
 export const UPDATE_ORDER_STATUS_BY_ADMIN = gql`
 	mutation UpdateOrderStatusByAdmin($input: UpdateOrderStatusInput!) {

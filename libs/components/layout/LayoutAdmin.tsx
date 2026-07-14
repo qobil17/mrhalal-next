@@ -22,6 +22,7 @@ const adminNavItems = [
 	{ href: '/admin/orders', label: '📦 Buyurtmalar' },
 	{ href: '/admin/members', label: '👥 Foydalanuvchilar' },
 	{ href: '/admin/categories', label: '🗂️ Kategoriyalar' },
+	{ href: '/admin/banners', label: '🖼️ Bannerlar' },
 ];
 
 // Module-level (not component state) so the "show once" behavior survives

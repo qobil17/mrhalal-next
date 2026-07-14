@@ -41,6 +41,23 @@ export const GET_EXPIRING_PRODUCTS = gql`
 	}
 `;
 
+export const GET_ALL_BANNERS_BY_ADMIN = gql`
+	query GetAllBannersByAdmin($input: BannersInquiry!) {
+		getAllBannersByAdmin(input: $input) {
+			list {
+				id
+				title
+				imageUrl
+				sortOrder
+				isActive
+			}
+			total
+			page
+			limit
+		}
+	}
+`;
+
 export const GET_ALL_CATEGORIES_BY_ADMIN = gql`
 	query GetAllCategoriesByAdmin($input: CategoriesInquiry!) {
 		getAllCategoriesByAdmin(input: $input) {

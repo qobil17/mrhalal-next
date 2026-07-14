@@ -16,6 +16,17 @@ export const GET_MY_PROFILE = gql`
 	}
 `;
 
+/** BANNER **/
+export const GET_ALL_BANNERS = gql`
+	query GetAllBanners {
+		getAllBanners {
+			id
+			title
+			imageUrl
+		}
+	}
+`;
+
 /** PRODUCT **/
 export const GET_ALL_PRODUCTS = gql`
 	query GetAllProducts($input: ProductsInquiry!) {
