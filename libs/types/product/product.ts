@@ -18,8 +18,8 @@ export interface Product {
 	images: ProductImage[];
 	categoryId: number;
 	isActive: boolean;
-	isFeatured: boolean;
 	label?: 'RECOMMENDED' | 'DISCOUNT' | null;
+	expiryDate?: string | null;
 	soldCount: number;
 	viewCount: number;
 	averageRating: number;

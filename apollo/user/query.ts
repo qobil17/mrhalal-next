@@ -31,7 +31,6 @@ export const GET_ALL_PRODUCTS = gql`
 				stockQuantity
 				slug
 				isActive
-				isFeatured
 				soldCount
 				averageRating
 				reviewCount
@@ -62,7 +61,6 @@ export const GET_FEATURED_PRODUCTS = gql`
 			stockQuantity
 			slug
 			isActive
-			isFeatured
 			soldCount
 			averageRating
 			reviewCount
@@ -89,7 +87,6 @@ export const GET_DISCOUNTED_PRODUCTS = gql`
 			stockQuantity
 			slug
 			isActive
-			isFeatured
 			soldCount
 			averageRating
 			reviewCount
@@ -123,7 +120,6 @@ export const GET_PRODUCT_BY_SLUG = gql`
 			}
 			categoryId
 			isActive
-			isFeatured
 			soldCount
 			viewCount
 			averageRating

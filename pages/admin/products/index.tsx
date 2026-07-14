@@ -32,7 +32,7 @@ interface ProductFormState {
 	stockQuantity: string;
 	unit: string;
 	isActive: boolean;
-	isFeatured: boolean;
+	expiryDate: string;
 }
 
 const EMPTY_FORM: ProductFormState = {
@@ -46,7 +46,7 @@ const EMPTY_FORM: ProductFormState = {
 	stockQuantity: '0',
 	unit: 'KG',
 	isActive: true,
-	isFeatured: false,
+	expiryDate: '',
 };
 
 const EMPTY_IMAGES: ImageRow[] = [{ url: '', isPrimary: true }];
@@ -126,7 +126,7 @@ const AdminProductsPage: NextPage = () => {
 			stockQuantity: product.stockQuantity != null ? String(product.stockQuantity) : '0',
 			unit: product.unit ?? 'KG',
 			isActive: product.isActive ?? true,
-			isFeatured: product.isFeatured ?? false,
+			expiryDate: product.expiryDate ? product.expiryDate.slice(0, 10) : '',
 		});
 		const existingImages: ImageRow[] =
 			product.images?.length > 0
@@ -202,8 +202,8 @@ const AdminProductsPage: NextPage = () => {
 			stockQuantity: parseInt(form.stockQuantity) || 0,
 			unit: form.unit,
 			isActive: form.isActive,
-			isFeatured: form.isFeatured,
 			...(form.comparePrice ? { comparePrice: parseFloat(form.comparePrice) } : {}),
+			...(form.expiryDate ? { expiryDate: new Date(form.expiryDate).toISOString() } : {}),
 		};
 
 		const validImages = images
@@ -397,6 +397,15 @@ const AdminProductsPage: NextPage = () => {
 										))}
 									</select>
 								</div>
+								<div className="form-group">
+									<label htmlFor="expiryDate">{t('adminExpiryDateLabel', lang)}</label>
+									<input
+										id="expiryDate"
+										type="date"
+										value={form.expiryDate}
+										onChange={(e) => setForm({ ...form, expiryDate: e.target.value })}
+									/>
+								</div>
 							</div>
 							<div className="form-row form-row--checkboxes">
 								<label className="admin-checkbox-label">
@@ -406,14 +415,6 @@ const AdminProductsPage: NextPage = () => {
 										onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
 									/>
 									Faol (sotuvda ko&apos;rinsin)
-								</label>
-								<label className="admin-checkbox-label">
-									<input
-										type="checkbox"
-										checked={form.isFeatured ?? false}
-										onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })}
-									/>
-									Tavsiya etilgan (bosh sahifada ko&apos;rinsin)
 								</label>
 							</div>
 						</fieldset>

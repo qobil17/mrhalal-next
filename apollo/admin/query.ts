@@ -13,8 +13,8 @@ export const GET_ALL_PRODUCTS_BY_ADMIN = gql`
 				unit
 				stockQuantity
 				isActive
-				isFeatured
 				label
+				expiryDate
 				images {
 					id
 					url
@@ -24,6 +24,19 @@ export const GET_ALL_PRODUCTS_BY_ADMIN = gql`
 			total
 			page
 			limit
+		}
+	}
+`;
+
+export const GET_EXPIRING_PRODUCTS = gql`
+	query GetExpiringProducts {
+		getExpiringProducts {
+			id
+			nameUz
+			nameKo
+			nameEn
+			price
+			expiryDate
 		}
 	}
 `;
