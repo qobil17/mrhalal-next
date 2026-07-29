@@ -10,4 +10,31 @@
 	.product-detail-price {
 		font-size: 24px;
 	}
+
+	.delivery-info-toggle {
+		padding: 12px 14px;
+		font-size: 13px;
+	}
+
+	.delivery-info-list {
+		padding: 0 14px 14px;
+
+		li {
+			font-size: 12px;
+		}
+	}
+
+	.support-banner,
+	.delivery-info-box {
+		margin-top: 12px;
+	}
+
+	.support-banner {
+		font-size: 12px;
+		padding: 12px 14px;
+	}
+
+	.terms-link {
+		font-size: 12px;
+	}
 }

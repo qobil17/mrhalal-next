@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import Image from 'next/image';
 import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
 import { withLayoutHome } from '../../libs/components/layout/LayoutHome';
@@ -31,6 +32,7 @@ const ProductDetailPage: NextPage = () => {
 	const lang = useReactiveVar(langVar);
 	const [quantity, setQuantity] = useState(1);
 	const [message, setMessage] = useState('');
+	const [deliveryInfoOpen, setDeliveryInfoOpen] = useState(true);
 
 	const { data, loading } = useQuery<{ getProductBySlug: Product | null }>(GET_PRODUCT_BY_SLUG, {
 		variables: { slug },
@@ -147,7 +149,9 @@ const ProductDetailPage: NextPage = () => {
 						</div>
 						<span className="product-detail-unit">{unit}</span>
 						<div className="product-detail-price">₩{price.toLocaleString()}</div>
-						<div className="product-detail-stock">{t('stock', lang)}: {stockQuantity} ta</div>
+						{stockQuantity > 0 && stockQuantity <= 5 && (
+							<div className="product-detail-stock product-detail-stock--low">⚠ {t('lowStockLabel', lang)}</div>
+						)}
 						<div className="product-detail-rating">
 							⭐ {product.averageRating.toFixed(1)} ({product.reviewCount} {t('reviews', lang)})
 						</div>
@@ -176,6 +180,41 @@ const ProductDetailPage: NextPage = () => {
 						</button>
 
 						<div className="detail-delivery">🚚 {t('deliveryFee', lang)}: {DELIVERY_FEE.toLocaleString()} ₩</div>
+
+						<div className="delivery-info-box">
+							<button
+								type="button"
+								className="delivery-info-toggle"
+								onClick={() => setDeliveryInfoOpen((prev) => !prev)}
+								aria-expanded={deliveryInfoOpen}
+							>
+								<span>📦 {t('deliveryInfoTitle', lang)}</span>
+								<span className={`delivery-info-caret${deliveryInfoOpen ? ' open' : ''}`}>⌄</span>
+							</button>
+
+							{deliveryInfoOpen && (
+								<ul className="delivery-info-list">
+									<li>
+										<span>{t('expectedDeliveryLabel', lang)}</span>
+										<strong>{t('expectedDeliveryValue', lang)}</strong>
+									</li>
+									<li>
+										<span>{t('cutoffTimeLabel', lang)}</span>
+										<strong>{t('cutoffTimeValue', lang)}</strong>
+									</li>
+									<li className="delivery-info-note">{t('regionalDeliveryNote', lang)}</li>
+								</ul>
+							)}
+						</div>
+
+						<Link href="/about" className="terms-link">
+							{t('termsAndConditionsLink', lang)}
+						</Link>
+
+						<div className="support-banner">
+							<span className="support-banner-icon" aria-hidden="true">ℹ️</span>
+							<span>{t('supportBannerText', lang)}</span>
+						</div>
 					</div>
 				</div>
 
