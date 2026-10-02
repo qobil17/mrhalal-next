@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { ApolloError, useMutation, useReactiveVar } from '@apollo/client';
 import Swal from 'sweetalert2';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
+import PageHead from '../../libs/components/common/PageHead';
 import { LOGIN, REGISTER } from '../../apollo/user/mutation';
 import { setJwtToken } from '../../libs/auth';
 import { userVar } from '../../apollo/client';
@@ -141,6 +142,7 @@ const AuthPage: NextPage = () => {
 
 	return (
 		<div id={device === 'mobile' ? 'mobile-wrap' : 'pc-wrap'} className="auth-page">
+			<PageHead title={t('login', lang)} />
 			<div className="auth-card">
 				<img src="/mrhalal_logo_v3.svg" alt="Mr Halal" width={80} className="auth-logo" />
 

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useQuery, useReactiveVar } from '@apollo/client';
 import Swal from 'sweetalert2';
+import PageHead from '../common/PageHead';
 import { removeJwtToken } from '../../auth';
 import { authReadyVar, userVar } from '../../../apollo/client';
 import { GET_EXPIRING_PRODUCTS } from '../../../apollo/admin/query';
@@ -93,6 +94,7 @@ const LayoutAdmin = ({ children }: LayoutAdminProps) => {
 	if (!authorized) {
 		return (
 			<div id="pc-wrap">
+				<PageHead title={t('adminPanelTitle', lang)} noIndex />
 				<p className="loading-text">Yuklanmoqda...</p>
 			</div>
 		);
@@ -100,6 +102,7 @@ const LayoutAdmin = ({ children }: LayoutAdminProps) => {
 
 	return (
 		<div id="pc-wrap">
+			<PageHead title={t('adminPanelTitle', lang)} noIndex />
 			<div className="admin-layout">
 				<aside className="admin-sidebar">
 					<div className="admin-logo">

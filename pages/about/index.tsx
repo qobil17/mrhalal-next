@@ -129,4 +129,4 @@ const AboutPage: NextPage = () => {
 	);
 };
 
-export default withLayoutHome(AboutPage);
+export default withLayoutHome(AboutPage, 'about');

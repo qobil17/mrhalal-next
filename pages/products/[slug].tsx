@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
 import { withLayoutHome } from '../../libs/components/layout/LayoutHome';
+import PageHead from '../../libs/components/common/PageHead';
 import ReviewSection from '../../libs/components/products/ReviewSection';
 import { GET_PRODUCT_BY_SLUG, GET_MY_CART, GET_MY_WISHLIST } from '../../apollo/user/query';
 import { ADD_TO_CART, ADD_TO_WISHLIST, REMOVE_FROM_WISHLIST } from '../../apollo/user/mutation';
@@ -118,6 +119,7 @@ const ProductDetailPage: NextPage = () => {
 
 	return (
 		<div className="product-detail-page">
+			<PageHead title={name} />
 			<div className="container">
 				<div className="product-detail-layout">
 					<div className="product-detail-image">
@@ -224,4 +226,4 @@ const ProductDetailPage: NextPage = () => {
 	);
 };
 
-export default withLayoutHome(ProductDetailPage);
+export default withLayoutHome(ProductDetailPage, 'products');

@@ -159,4 +159,4 @@ const CartPage: NextPage = () => {
 	);
 };
 
-export default withLayoutHome(CartPage);
+export default withLayoutHome(CartPage, 'cart');

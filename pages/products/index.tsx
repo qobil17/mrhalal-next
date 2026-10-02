@@ -96,4 +96,4 @@ const ProductsPage: NextPage = () => {
 	);
 };
 
-export default withLayoutHome(ProductsPage);
+export default withLayoutHome(ProductsPage, 'products');

@@ -156,4 +156,4 @@ const ProfilePage: NextPage = () => {
 	);
 };
 
-export default withLayoutHome(ProfilePage);
+export default withLayoutHome(ProfilePage, 'profile');
