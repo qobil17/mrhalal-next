@@ -19,9 +19,19 @@ export const removeJwtToken = (): void => {
 
 export const updateUserInfo = (token: string): void => {
 	try {
-		const decoded = jwtDecode<Member>(token);
+		const decoded = jwtDecode<Member & { exp?: number }>(token);
+
+		// An expired token would otherwise look "logged in" until the first API
+		// call fails with UNAUTHENTICATED and hard-redirects to /auth.
+		if (decoded.exp && decoded.exp * 1000 <= Date.now()) {
+			removeJwtToken();
+			userVar(null);
+			return;
+		}
+
 		userVar(decoded);
 	} catch {
+		removeJwtToken();
 		userVar(null);
 	}
 };
