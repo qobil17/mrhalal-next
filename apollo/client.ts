@@ -6,7 +6,8 @@ import { GRAPHQL_URL } from '../libs/config';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const userVar = makeVar<any>(null);
-export const networkErrorVar = makeVar<string | null>(null);
+// Set to true on a network error; NetworkErrorToast shows a localized message and resets it.
+export const networkErrorVar = makeVar<boolean>(false);
 
 // Stays false until the app has attempted to rehydrate the session from
 // localStorage (see pages/_app.tsx). Auth-dependent guards/UI must wait for
@@ -44,7 +45,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 	if (networkError) {
 		console.error(`[Network error]: ${networkError}`);
-		networkErrorVar("Serverga ulanib bo'lmadi. Internet aloqasini tekshiring yoki birozdan so'ng qayta urinib ko'ring.");
+		networkErrorVar(true);
 	}
 });
 

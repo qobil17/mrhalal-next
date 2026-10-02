@@ -190,6 +190,10 @@ const STRINGS = {
 
 		loading: 'Yuklanmoqda...',
 		genericError: "Xatolik yuz berdi, qayta urinib ko'ring",
+		networkError: "Serverga ulanib bo'lmadi. Internet aloqasini tekshiring yoki birozdan so'ng qayta urinib ko'ring.",
+		crashTitle: 'Nimadir xato ketdi',
+		crashText: "Sahifani qayta yuklab ko'ring.",
+		reloadButton: 'Qayta yuklash',
 
 		adminPanelTitle: 'Admin panel',
 		adminLabelColumn: 'Yorliq',
@@ -354,6 +358,10 @@ const STRINGS = {
 
 		loading: '로딩 중...',
 		genericError: '오류가 발생했습니다. 다시 시도해 주세요',
+		networkError: '서버에 연결할 수 없습니다. 인터넷 연결을 확인하거나 잠시 후 다시 시도해 주세요.',
+		crashTitle: '문제가 발생했습니다',
+		crashText: '페이지를 새로고침해 주세요.',
+		reloadButton: '새로고침',
 
 		adminPanelTitle: '관리자 패널',
 		adminLabelColumn: '라벨',
@@ -519,6 +527,10 @@ const STRINGS = {
 
 		loading: 'Loading...',
 		genericError: 'Something went wrong, please try again',
+		networkError: "Couldn't reach the server. Check your internet connection or try again shortly.",
+		crashTitle: 'Something went wrong',
+		crashText: 'Please reload the page.',
+		reloadButton: 'Reload',
 
 		adminPanelTitle: 'Admin panel',
 		adminLabelColumn: 'Label',

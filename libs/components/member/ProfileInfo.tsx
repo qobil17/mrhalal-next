@@ -73,7 +73,7 @@ const ProfileInfo = ({ user }: ProfileInfoProps) => {
 
 			if (!res.ok) {
 				const data = (await res.json().catch(() => ({}))) as { message?: string };
-				throw new Error(data.message ?? `Server xatosi: ${res.status}`);
+				throw new Error(data.message ?? t('uploadFailedText', lang));
 			}
 
 			const { url } = (await res.json()) as { url: string; publicId: string };

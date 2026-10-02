@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { langVar, t } from '../../i18n';
 
 interface ErrorBoundaryProps {
 	children: ReactNode;
@@ -21,13 +22,16 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
 	render() {
 		if (this.state.hasError) {
+			// Class component, so read the reactive var directly instead of useReactiveVar.
+			const lang = langVar();
+
 			return (
 				<div className="app-crash-fallback">
 					<span>😕</span>
-					<h2>Nimadir xato ketdi</h2>
-					<p>Sahifani qayta yuklab ko&apos;ring.</p>
+					<h2>{t('crashTitle', lang)}</h2>
+					<p>{t('crashText', lang)}</p>
 					<button type="button" onClick={() => window.location.reload()}>
-						Qayta yuklash
+						{t('reloadButton', lang)}
 					</button>
 				</div>
 			);
