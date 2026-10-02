@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -39,11 +39,14 @@ const LayoutAdmin = ({ children }: LayoutAdminProps) => {
 	const lang = useReactiveVar(langVar);
 	const authorized = authReady && !!user && user.role === 'ADMIN';
 	const [showExpiryPanel, setShowExpiryPanel] = useState(false);
+	// Captured when the panel is opened (in the click handler, not during render)
+	// so the "N days left" labels stay pure.
+	const [panelOpenedAt, setPanelOpenedAt] = useState(0);
 
 	const { data: expiringData } = useQuery<{ getExpiringProducts: Product[] }>(GET_EXPIRING_PRODUCTS, {
 		skip: !authorized,
 	});
-	const expiringProducts = expiringData?.getExpiringProducts ?? [];
+	const expiringProducts = useMemo(() => expiringData?.getExpiringProducts ?? [], [expiringData]);
 
 	useEffect(() => {
 		// Session is still being rehydrated from localStorage - don't make any
@@ -74,7 +77,7 @@ const LayoutAdmin = ({ children }: LayoutAdminProps) => {
 	}, [expiringData, expiringProducts, lang]);
 
 	const getDaysLabel = (expiryDate: string): { text: string; overdue: boolean } => {
-		const diffDays = Math.ceil((new Date(expiryDate).getTime() - Date.now()) / MS_PER_DAY);
+		const diffDays = Math.ceil((new Date(expiryDate).getTime() - panelOpenedAt) / MS_PER_DAY);
 
 		if (diffDays === 0) return { text: t('adminExpiryDueToday', lang), overdue: false };
 		if (diffDays > 0) return { text: t('adminExpiryDaysLeft', lang).replace('{days}', String(diffDays)), overdue: false };
@@ -124,7 +127,10 @@ const LayoutAdmin = ({ children }: LayoutAdminProps) => {
 							<button
 								type="button"
 								className="notification-bell"
-								onClick={() => setShowExpiryPanel((prev) => !prev)}
+								onClick={() => {
+									setPanelOpenedAt(Date.now());
+									setShowExpiryPanel((prev) => !prev);
+								}}
 								aria-label={t('adminExpiryPanelTitle', lang)}
 							>
 								🔔
