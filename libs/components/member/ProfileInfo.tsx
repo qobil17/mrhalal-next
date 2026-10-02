@@ -5,11 +5,11 @@ import { useMutation, useReactiveVar } from '@apollo/client';
 import Swal from 'sweetalert2';
 import { UPDATE_MY_PROFILE } from '../../../apollo/user/mutation';
 import { getJwtToken } from '../../auth';
+import { API_BASE } from '../../config';
 import { userVar } from '../../../apollo/client';
 import { langVar, t } from '../../i18n';
 import type { Member } from '../../types/member/member';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 

@@ -2,6 +2,7 @@ import { ApolloClient, InMemoryCache, createHttpLink, from, makeVar } from '@apo
 import { onError } from '@apollo/client/link/error';
 import { setContext } from '@apollo/link-context';
 import { getJwtToken, removeJwtToken } from '../libs/auth';
+import { GRAPHQL_URL } from '../libs/config';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const userVar = makeVar<any>(null);
@@ -14,7 +15,7 @@ export const networkErrorVar = makeVar<string | null>(null);
 export const authReadyVar = makeVar<boolean>(false);
 
 const httpLink = createHttpLink({
-	uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:3000/graphql',
+	uri: GRAPHQL_URL,
 });
 
 const authLink = setContext((_, { headers }) => {

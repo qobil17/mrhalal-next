@@ -4,6 +4,7 @@ import type { NextPage } from 'next';
 import { useMutation, useQuery } from '@apollo/client';
 import Swal from 'sweetalert2';
 import { getJwtToken } from '../../../libs/auth';
+import { API_BASE } from '../../../libs/config';
 import { withLayoutAdmin } from '../../../libs/components/layout/LayoutAdmin';
 import { GET_ALL_BANNERS_BY_ADMIN } from '../../../apollo/admin/query';
 import {
@@ -26,8 +27,6 @@ const EMPTY_FORM: BannerFormState = {
 	sortOrder: '0',
 	isActive: true,
 };
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
 
 const AdminBannersPage: NextPage = () => {
 	const [showForm, setShowForm] = useState(false);

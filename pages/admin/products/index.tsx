@@ -4,6 +4,7 @@ import type { NextPage } from 'next';
 import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
 import Swal from 'sweetalert2';
 import { getJwtToken } from '../../../libs/auth';
+import { API_BASE } from '../../../libs/config';
 import { withLayoutAdmin } from '../../../libs/components/layout/LayoutAdmin';
 import { langVar, t } from '../../../libs/i18n';
 import { GET_ALL_PRODUCTS_BY_ADMIN } from '../../../apollo/admin/query';
@@ -63,8 +64,6 @@ const isFormDirty = (form: ProductFormState, images: ImageRow[]) =>
 	form.categoryId !== '' ||
 	form.price !== '' ||
 	images.some((img) => img.url !== '');
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
 
 const AdminProductsPage: NextPage = () => {
 	const [showForm, setShowForm] = useState(false);
